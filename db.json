@@ -1,0 +1,370 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Marios",
+      "surname": "Rossi",
+      "email": "mario@example.com",
+      "password": "password123",
+      "role": "admin",
+      "address": null,
+      "city": null,
+      "zipCode": null,
+      "country": null,
+      "province": null
+    },
+    {
+      "id": "2",
+      "name": "Luisa",
+      "surname": "Bianchi",
+      "email": "luisa@example.com",
+      "password": "password123",
+      "role": "user",
+      "address": null,
+      "city": null,
+      "zipCode": null,
+      "country": null,
+      "province": null
+    },
+    {
+      "id": "3",
+      "name": "Andrea",
+      "surname": "Verdi",
+      "email": "andrea@example.com",
+      "password": "password123",
+      "role": "user",
+      "address": null,
+      "city": null,
+      "zipCode": null,
+      "country": null,
+      "province": null
+    },
+    {
+      "id": "4",
+      "name": "Giulia",
+      "surname": "Neri",
+      "email": "giulia@example.com",
+      "password": "password123",
+      "role": "user",
+      "address": null,
+      "city": null,
+      "zipCode": null,
+      "country": null,
+      "province": null
+    }
+  ],
+  "posts": [
+    {
+      "id": "1",
+      "userId": 2,
+      "title": "Viaggiare in Giappone: tra cultura e sogno",
+      "content": "Il Giappone è una meta affascinante che unisce tradizione e modernità. In questo articolo racconto la mia esperienza tra Tokyo, Kyoto e Osaka, spiegando come organizzare gli spostamenti, dove mangiare e quali usanze culturali è importante rispettare. Un viaggio che lascia il segno e che consiglio a chiunque voglia scoprire una cultura unica.",
+      "createdAt": "2026-02-01T09:30:00Z",
+      "updatedAt": "2026-02-01T09:30:00Z",
+      "rating": 3.5,
+      "tags": [
+        "travel",
+        "japan",
+        "culture"
+      ],
+      "timeLecture": 8,
+      "image": "../assets/posts/travel1.jpg",
+      "category": "Travel",
+      "status": "published",
+      "comments": [
+        {
+          "id": 20,
+          "postId": 10,
+          "userId": 3,
+          "title": "Fantastico",
+          "content": "Sogno di andarci da anni, guida super utile!",
+          "createdAt": "2026-02-01T14:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "userId": 3,
+      "title": "Zaino in spalla: viaggiare low cost in Europa",
+      "content": "Viaggiare in Europa con un budget ridotto è possibile. In questo post condivido consigli pratici su come risparmiare su voli, alloggi e cibo, senza rinunciare all’esperienza. Dalle capitali più famose alle città meno conosciute, ogni viaggio può diventare un’avventura indimenticabile.",
+      "createdAt": "2026-02-03T10:15:00Z",
+      "updatedAt": "2026-02-03T10:15:00Z",
+      "rating": 3.5,
+      "tags": [
+        "travel",
+        "europe",
+        "backpacking"
+      ],
+      "timeLecture": 7,
+      "image": "../assets/posts/travel2.jpg",
+      "category": "Travel",
+      "status": "published",
+      "comments": [
+        {
+          "id": 21,
+          "postId": 11,
+          "userId": 1,
+          "title": "Ottimi consigli",
+          "content": "Perfetto per chi ama viaggiare spesso.",
+          "createdAt": "2026-02-03T18:30:00Z"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "userId": 4,
+      "title": "Cucina italiana: piatti semplici ma perfetti",
+      "content": "La cucina italiana è famosa in tutto il mondo per la sua semplicità e qualità. In questo articolo parlo di alcuni piatti tradizionali, spiegando perché pochi ingredienti ben scelti possono fare la differenza. Un viaggio tra sapori autentici e ricette intramontabili.",
+      "createdAt": "2026-02-05T11:00:00Z",
+      "updatedAt": "2026-02-05T11:00:00Z",
+      "rating": 2.5,
+      "tags": [
+        "food",
+        "italian",
+        "recipes"
+      ],
+      "timeLecture": 6,
+      "image": "../assets/posts/food1.jpg",
+      "category": "Food",
+      "status": "published",
+      "comments": [
+        {
+          "id": 22,
+          "postId": 12,
+          "userId": 2,
+          "title": "Che fame!",
+          "content": "Articolo bellissimo, mi hai fatto venire fame.",
+          "createdAt": "2026-02-05T16:10:00Z"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "userId": 2,
+      "title": "Street food nel mondo: cosa assaggiare",
+      "content": "Lo street food racconta la vera anima di un paese. In questo post esploro alcune delle migliori esperienze di street food nel mondo, dal cibo asiatico alle specialità sudamericane. Sapori intensi, prezzi accessibili e tradizioni locali.",
+      "createdAt": "2026-02-06T09:45:00Z",
+      "updatedAt": "2026-02-06T09:45:00Z",
+      "rating": 4.5,
+      "tags": [
+        "food",
+        "streetfood",
+        "travel"
+      ],
+      "timeLecture": 7,
+      "image": "../assets/posts/food2.jpg",
+      "category": "Food",
+      "status": "published",
+      "comments": [
+        {
+          "id": 23,
+          "postId": 13,
+          "userId": 3,
+          "title": "Adoro",
+          "content": "Lo street food è sempre la scelta migliore.",
+          "createdAt": "2026-02-06T13:50:00Z"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "userId": 3,
+      "title": "Tendenze moda primavera 2026",
+      "content": "La moda primavera 2026 punta su colori naturali, tessuti sostenibili e linee comode. In questo articolo analizziamo le principali tendenze viste sulle passerelle e come adattarle alla vita quotidiana, senza rinunciare allo stile.",
+      "createdAt": "2026-02-07T10:00:00Z",
+      "updatedAt": "2026-02-07T10:00:00Z",
+      "rating":5,
+      "tags": [
+        "fashion",
+        "trends",
+        "style"
+      ],
+      "timeLecture": 6,
+      "image": "../assets/posts/fashion1.jpg",
+      "category": "Fashion",
+      "status": "published",
+      "comments": [
+        {
+          "id": 24,
+          "postId": 14,
+          "userId": 4,
+          "title": "Interessante",
+          "content": "Mi piacciono molto queste nuove tendenze.",
+          "createdAt": "2026-02-07T15:20:00Z"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "userId": 3,
+      "title": "Come creare un guardaroba minimal",
+      "content": "Un guardaroba minimal aiuta a semplificare la vita e a vestirsi meglio. In questo post spiego come scegliere capi versatili, colori neutri e materiali di qualità per creare outfit sempre efficaci e senza eccessi.",
+      "createdAt": "2026-02-08T11:30:00Z",
+      "updatedAt": "2026-02-08T11:30:00Z",
+      "rating": 3,
+      "tags": [
+        "fashion",
+        "minimal",
+        "wardrobe"
+      ],
+      "timeLecture": 7,
+      "image": "../assets/posts/fashion2.jpg",
+      "category": "Fashion",
+      "status": "published",
+      "comments": [
+        {
+          "id": 25,
+          "postId": 15,
+          "userId": 1,
+          "title": "Ottimo approccio",
+          "content": "Il minimal funziona sempre.",
+          "createdAt": "2026-02-08T16:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "userId": 1,
+      "title": "Intelligenza artificiale: opportunità e rischi",
+      "content": "L’intelligenza artificiale sta cambiando il nostro modo di lavorare e vivere. In questo articolo analizziamo i vantaggi dell’AI, le applicazioni più comuni e i rischi etici legati al suo utilizzo.",
+      "createdAt": "2026-02-09T09:00:00Z",
+      "updatedAt": "2026-02-09T09:00:00Z",
+      "rating": 4,
+      "tags": [
+        "technology",
+        "ai",
+        "future"
+      ],
+      "timeLecture": 9,
+      "image": "../assets/posts/tech1.jpg",
+      "category": "Technology",
+      "status": "published",
+      "comments": [
+        {
+          "id": 26,
+          "postId": 16,
+          "userId": 2,
+          "title": "Tema attuale",
+          "content": "Argomento spiegato molto bene.",
+          "createdAt": "2026-02-09T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "userId": 1,
+      "title": "Come iniziare a programmare nel 2026",
+      "content": "Iniziare a programmare oggi può sembrare complicato, ma con le giuste risorse è più semplice di quanto si pensi. In questo post consiglio linguaggi, strumenti e percorsi di studio per chi vuole entrare nel mondo dello sviluppo software.",
+      "createdAt": "2026-02-10T10:20:00Z",
+      "updatedAt": "2026-02-10T10:20:00Z",
+      "rating": 4.5,
+      "tags": [
+        "technology",
+        "programming",
+        "learning"
+      ],
+      "timeLecture": 8,
+      "image": "../assets/posts/tech2.jpg",
+      "category": "Technology",
+      "status": "published",
+      "comments": [
+        {
+          "id": 27,
+          "postId": 17,
+          "userId": 3,
+          "title": "Utilissimo",
+          "content": "Perfetto per chi vuole iniziare.",
+          "createdAt": "2026-02-10T15:40:00Z"
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "userId": 4,
+      "title": "Benessere mentale nella vita quotidiana",
+      "content": "Prendersi cura della salute mentale è fondamentale. In questo articolo parliamo di piccoli gesti quotidiani che possono migliorare il nostro benessere psicologico.",
+      "createdAt": "2026-02-11T09:10:00Z",
+      "updatedAt": "2026-02-11T09:10:00Z",
+      "rating": 5,
+      "tags": [
+        "health",
+        "mental",
+        "wellness"
+      ],
+      "timeLecture": 7,
+      "image": "../assets/posts/health1.jpg",
+      "category": "Health",
+      "status": "published",
+      "comments": [
+        {
+          "id": 28,
+          "postId": 18,
+          "userId": 1,
+          "title": "Molto utile",
+          "content": "Tema importante e ben trattato.",
+          "createdAt": "2026-02-11T14:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "userId": 4,
+      "title": "Alimentazione sana: da dove iniziare",
+      "content": "Mangiare sano non significa rinunciare al gusto. In questo post spiego come costruire un’alimentazione equilibrata partendo da piccoli cambiamenti.",
+      "createdAt": "2026-02-12T10:45:00Z",
+      "updatedAt": "2026-02-12T10:45:00Z",
+      "rating": 3,
+      "tags": [
+        "health",
+        "nutrition",
+        "lifestyle"
+      ],
+      "timeLecture": 6,
+      "image": "../assets/posts/health2.jpg",
+      "category": "Health",
+      "status": "published",
+      "comments": [
+        {
+          "id": 29,
+          "postId": 19,
+          "userId": 2,
+          "title": "Chiaro e utile",
+          "content": "Finalmente spiegato in modo semplice.",
+          "createdAt": "2026-02-12T16:20:00Z"
+        }
+      ]
+    },
+    {
+      "id": "1934",
+      "userId": 1,
+      "title": "Frasi, aforismi e citazioni sul Benessere e la Salute",
+      "content": "[{\"type\":\"heading-two\",\"children\":[{\"text\":\"Test\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]",
+      "createdAt": "2026-02-11T16:10:59.289Z",
+      "updatedAt": "2026-02-11T16:10:59.289Z",
+      "tags": [
+        "Frasi",
+        "Healt",
+        "Author"
+      ],
+      "timeLecture": 6,
+      "image": "",
+      "category": "Health",
+      "status": "draft"
+    },
+    {
+      "id": 1935,
+      "userId": "1",
+      "title": "Test",
+      "content": "[{\"type\":\"heading-one\",\"children\":[{\"text\":\"Test\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"Prova \"},{\"text\":\"prova\",\"bold\":true}]},{\"type\":\"numbered-list\",\"children\":[{\"bold\":true,\"text\":\"test\"}]},{\"type\":\"numbered-list\",\"children\":[{\"text\":\"eeee\"}]},{\"type\":\"numbered-list\",\"children\":[{\"text\":\"eeeee\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"ssdsdsdsdsd\"}]}]",
+      "createdAt": "2026-02-11T16:36:10.555Z",
+      "updatedAt": "2026-02-11T16:36:10.555Z",
+      "tags": [
+        "emme"
+      ],
+      "timeLecture": 3,
+      "image": "C:\\fakepath\\Screenshot 2026-02-09 171525.png",
+      "category": "Travel",
+      "status": "draft"
+    }
+  ]
+}

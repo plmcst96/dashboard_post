@@ -1,0 +1,86 @@
+
+
+
+/* ------------------ FONTS ------------------ */
+
+/* Light */
+@font-face {
+  font-family: 'MyFont';
+  src: url('./assets/font/myFont/LufgaLight.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Regular */
+@font-face {
+  font-family: 'MyFont';
+  src: url('./assets/font/myFont/LufgaRegular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Medium */
+@font-face {
+  font-family: 'MyFont';
+  src: url('./assets/font/myFont/LufgaMedium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Bold */
+@font-face {
+  font-family: 'MyFont';
+  src: url('./assets/font/myFont/LufgaBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Italic */
+@font-face {
+  font-family: 'MyFont';
+  src: url('./assets/font/myFont/LufgaItalic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* ------------------ ROOT VARIABLES ------------------ */
+:root {
+  font-family: 'MyFont', sans-serif;
+
+  /* Primary Colors */
+  --color-primary-dark-bg: #F4D55D;
+  --color-primary-dark-text: #191810;
+  --color-primary-light-bg: #FFFFFF;
+
+  /* Secondary Colors */
+  --color-secondary-post-bg: #FFACA0;
+  --color-secondary-post-bg1: #b1e89b;
+  --color-secondary-post-bg2: #cccefd;
+}
+
+/* ------------------ TYPOGRAPHY ------------------ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'MyFont', sans-serif;
+  font-weight: 700; /* Bold */
+}
+
+p {
+  font-family: 'MyFont', sans-serif;
+  font-weight: 400; /* Regular */
+}
+
+em, i {
+  font-style: italic; /* Italic */
+}
+
+strong {
+  font-weight: 700; /* Bold */
+}
+
+small {
+  font-weight: 300; /* Light */
+}
+
+#click-drawer:hover {
+  background-color: #FFFFFF !important;
+}
