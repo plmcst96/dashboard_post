@@ -12,6 +12,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Rating,
   styled,
   Typography,
 } from "@mui/material";
@@ -37,6 +38,8 @@ import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import React from "react";
+import SlateEditor, { type CustomElement } from "../components/SlateEditor";
+import type { Descendant } from "slate";
 
 const IOSSwitch = styled((props: SwitchProps) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -102,9 +105,28 @@ export const PostDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { post, fetchPost, fetchState } = usePostStore();
   const [edit, setEdit] = useState(false);
-  const { user, fetchUser } = useUserStore();
+  const { user, fetchUser, fetchUsers, users } = useUserStore();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
+  const open1 = Boolean(anchorEl1);
+  const [contentValue, setContentValue] = useState<Descendant[]>([]);
+
+  const handleEditClick = () => {
+    if (post?.content) {
+      try {
+        setContentValue(JSON.parse(post.content));
+      } catch {
+        setContentValue([
+          {
+            type: "paragraph",
+            children: [{ text: post.content }],
+          } as CustomElement,
+        ]);
+      }
+    }
+    setEdit(true);
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -113,6 +135,17 @@ export const PostDetailsPage = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleClick1 = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl1(event.currentTarget);
+  };
+
+  const handleClose1 = () => {
+    setAnchorEl1(null);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   useEffect(() => {
     fetchPost(Number(id));
@@ -241,15 +274,11 @@ export const PostDetailsPage = () => {
             <FormControlLabel
               control={<IOSSwitch sx={{ m: 1 }} />}
               label={edit ? "Edit" : "Show"}
-              onChange={() => setEdit(true)}
+              onChange={handleEditClick}
             />
           </Box>
         </Box>
-        <Grid
-          container
-          spacing={3}
-          sx={{ flexGrow: 1, minHeight: 0 }}
-        >
+        <Grid container spacing={3} sx={{ flexGrow: 1, minHeight: 0 }}>
           <Grid size={{ xs: 12, md: 8 }} sx={{ p: 4 }}>
             <Card elevation={3} sx={{ p: 4, borderRadius: 3 }}>
               <Box>
@@ -257,34 +286,60 @@ export const PostDetailsPage = () => {
                   {post.title}
                 </Typography>
               </Box>
-
               <CardMedia
                 component="img"
-                height="300"
                 image={getPostImage(post.image)}
                 alt={post.title}
-                sx={{ borderRadius: 3, mt: 3 }}
+                sx={{
+                  height: 400,
+                  objectFit: "cover",
+                  objectPosition: "top",
+                  borderRadius: 3,
+                  mt: 3,
+                  backgroundColor: "#f5f5f5", // opzionale, evita spazio bianco brutto
+                }}
               />
 
-              <Typography component="div" variant="body1" sx={{ mt: 4 }}>
-                <Typography>
-                  {post.content || extractTextFromSlate(post.content)}
-                </Typography>
+              {edit ? (
+                <Box
+                  sx={{
+                    border: "1px solid #ccc",
+                    borderRadius: 2,
+                    minHeight: 200,
+                    maxHeight: 400,
+                    width: "100%",
+                    p: 1,
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    mt: 3,
+                  }}
+                >
+                  <SlateEditor
+                    value={contentValue}
+                    setValue={setContentValue}
+                  />
+                </Box>
+              ) : (
+                <Typography component="div" variant="body1" sx={{ mt: 4 }}>
+                  <Typography>
+                    {post.content || extractTextFromSlate(post.content)}
+                  </Typography>
 
-                <Typography>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Est
-                  blanditiis veritatis nam exercitationem ad esse saepe
-                  molestias necessitatibus qui. Distinctio perferendis aliquam
-                  aperiam, explicabo modi neque architecto nostrum ea nihil?
-                </Typography>
+                  <Typography>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Est
+                    blanditiis veritatis nam exercitationem ad esse saepe
+                    molestias necessitatibus qui. Distinctio perferendis aliquam
+                    aperiam, explicabo modi neque architecto nostrum ea nihil?
+                  </Typography>
 
-                <Typography>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Distinctio maiores facilis officiis mollitia libero
-                  consequuntur! Earum nam modi sit cum ipsa. Alias esse
-                  veritatis saepe voluptatum reiciendis doloribus nihil ipsam?
+                  <Typography>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Distinctio maiores facilis officiis mollitia libero
+                    consequuntur! Earum nam modi sit cum ipsa. Alias esse
+                    veritatis saepe voluptatum reiciendis doloribus nihil ipsam?
+                  </Typography>
                 </Typography>
-              </Typography>
+              )}
             </Card>
             <Card elevation={3} sx={{ p: 4, borderRadius: 3, mt: 4 }}>
               <Box>
@@ -341,46 +396,44 @@ export const PostDetailsPage = () => {
                           display="flex"
                           justifyContent="end"
                         >
-                         
-                              <IconButton onClick={handleClick}>
-                                <MoreVertIcon />
-                              </IconButton>
+                          <IconButton onClick={handleClick}>
+                            <MoreVertIcon />
+                          </IconButton>
 
-                              <Menu
-                                anchorEl={anchorEl}
-                                open={open}
-                                onClose={handleClose}
-                                anchorOrigin={{
-                                  vertical: "bottom",
-                                  horizontal: "right",
-                                }}
-                                transformOrigin={{
-                                  vertical: "top",
-                                  horizontal: "right",
-                                }}
-                              >
-                                <MenuItem onClick={handleClose}>
-                                  <ModeEditOutlinedIcon
-                                    sx={{ fontSize: 20, mr: 1 }}
-                                  />
-                                  Edit Comment
-                                </MenuItem>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "right",
+                            }}
+                            transformOrigin={{
+                              vertical: "top",
+                              horizontal: "right",
+                            }}
+                          >
+                            <MenuItem onClick={handleClose}>
+                              <ModeEditOutlinedIcon
+                                sx={{ fontSize: 20, mr: 1 }}
+                              />
+                              Edit Comment
+                            </MenuItem>
 
-                                <MenuItem onClick={handleClose}>
-                                  <AddCircleOutlineOutlinedIcon
-                                    sx={{ fontSize: 20, mr: 1 }}
-                                  />
-                                  Add Comment
-                                </MenuItem>
+                            <MenuItem onClick={handleClose}>
+                              <AddCircleOutlineOutlinedIcon
+                                sx={{ fontSize: 20, mr: 1 }}
+                              />
+                              Add Comment
+                            </MenuItem>
 
-                                <MenuItem onClick={handleClose}>
-                                  <DeleteOutlinedIcon
-                                    sx={{ fontSize: 20, mr: 1 }}
-                                  />
-                                  Delete Comment
-                                </MenuItem>
-                              </Menu>
-                      
+                            <MenuItem onClick={handleClose}>
+                              <DeleteOutlinedIcon
+                                sx={{ fontSize: 20, mr: 1 }}
+                              />
+                              Delete Comment
+                            </MenuItem>
+                          </Menu>
                         </Grid>
                         <Grid mt={2}>
                           <Typography variant="subtitle1">
@@ -396,7 +449,64 @@ export const PostDetailsPage = () => {
           </Grid>
           <Grid size={{ xs: 12, md: 4 }} sx={{ p: 4 }}>
             <Card elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                POST AUTHOR
+              </Typography>
+              <Box
+                display="flex"
+                flexDirection="row"
+                alignItems="center"
+                sx={{ mt: 2 }}
+              >
+                <Avatar>
+                  <img src={avatar} alt="avatar" width={40} />
+                </Avatar>
+                <Typography variant="body1" sx={{ ml: 2 }}>
+                  {user?.name + " " + user?.surname}
+                </Typography>
+              </Box>
+              <Box
+                display="flex"
+                flexDirection="row"
+                alignItems="center"
+                sx={{ mt: 2 }}
+              >
+                <Rating name="rate" value={post.rate} readOnly />
+                <Typography variant="body2" component="legend" sx={{ ml: 2 }}>
+                  ({post.rate}/5 rating)
+                </Typography>
+              </Box>
+              {edit && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 2, borderRadius: 5 }}
+                  onClick={handleClick1}
+                >
+                  Change Author
+                </Button>
+              )}
+              {open1 && (
+                <Menu
+                  anchorEl={anchorEl1}
+                  open={open1}
+                  onClose={handleClose1}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                >
+                  {users.map((us) => (
+                    <MenuItem key={us.id}>
+                      {us.name + " " + us.surname}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              )}
             </Card>
           </Grid>
         </Grid>

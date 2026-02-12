@@ -61,7 +61,7 @@
       "content": "Il Giappone è una meta affascinante che unisce tradizione e modernità. In questo articolo racconto la mia esperienza tra Tokyo, Kyoto e Osaka, spiegando come organizzare gli spostamenti, dove mangiare e quali usanze culturali è importante rispettare. Un viaggio che lascia il segno e che consiglio a chiunque voglia scoprire una cultura unica.",
       "createdAt": "2026-02-01T09:30:00Z",
       "updatedAt": "2026-02-01T09:30:00Z",
-      "rating": 3.5,
+      "rate": 3.5,
       "tags": [
         "travel",
         "japan",
@@ -89,7 +89,7 @@
       "content": "Viaggiare in Europa con un budget ridotto è possibile. In questo post condivido consigli pratici su come risparmiare su voli, alloggi e cibo, senza rinunciare all’esperienza. Dalle capitali più famose alle città meno conosciute, ogni viaggio può diventare un’avventura indimenticabile.",
       "createdAt": "2026-02-03T10:15:00Z",
       "updatedAt": "2026-02-03T10:15:00Z",
-      "rating": 3.5,
+      "rate": 3.5,
       "tags": [
         "travel",
         "europe",
@@ -117,7 +117,7 @@
       "content": "La cucina italiana è famosa in tutto il mondo per la sua semplicità e qualità. In questo articolo parlo di alcuni piatti tradizionali, spiegando perché pochi ingredienti ben scelti possono fare la differenza. Un viaggio tra sapori autentici e ricette intramontabili.",
       "createdAt": "2026-02-05T11:00:00Z",
       "updatedAt": "2026-02-05T11:00:00Z",
-      "rating": 2.5,
+      "rate": 2.5,
       "tags": [
         "food",
         "italian",
@@ -145,7 +145,7 @@
       "content": "Lo street food racconta la vera anima di un paese. In questo post esploro alcune delle migliori esperienze di street food nel mondo, dal cibo asiatico alle specialità sudamericane. Sapori intensi, prezzi accessibili e tradizioni locali.",
       "createdAt": "2026-02-06T09:45:00Z",
       "updatedAt": "2026-02-06T09:45:00Z",
-      "rating": 4.5,
+      "rate": 4.5,
       "tags": [
         "food",
         "streetfood",
@@ -173,7 +173,7 @@
       "content": "La moda primavera 2026 punta su colori naturali, tessuti sostenibili e linee comode. In questo articolo analizziamo le principali tendenze viste sulle passerelle e come adattarle alla vita quotidiana, senza rinunciare allo stile.",
       "createdAt": "2026-02-07T10:00:00Z",
       "updatedAt": "2026-02-07T10:00:00Z",
-      "rating":5,
+      "rate":5,
       "tags": [
         "fashion",
         "trends",
@@ -201,7 +201,7 @@
       "content": "Un guardaroba minimal aiuta a semplificare la vita e a vestirsi meglio. In questo post spiego come scegliere capi versatili, colori neutri e materiali di qualità per creare outfit sempre efficaci e senza eccessi.",
       "createdAt": "2026-02-08T11:30:00Z",
       "updatedAt": "2026-02-08T11:30:00Z",
-      "rating": 3,
+      "rate": 3,
       "tags": [
         "fashion",
         "minimal",
@@ -229,7 +229,7 @@
       "content": "L’intelligenza artificiale sta cambiando il nostro modo di lavorare e vivere. In questo articolo analizziamo i vantaggi dell’AI, le applicazioni più comuni e i rischi etici legati al suo utilizzo.",
       "createdAt": "2026-02-09T09:00:00Z",
       "updatedAt": "2026-02-09T09:00:00Z",
-      "rating": 4,
+      "rate": 4,
       "tags": [
         "technology",
         "ai",
@@ -257,7 +257,7 @@
       "content": "Iniziare a programmare oggi può sembrare complicato, ma con le giuste risorse è più semplice di quanto si pensi. In questo post consiglio linguaggi, strumenti e percorsi di studio per chi vuole entrare nel mondo dello sviluppo software.",
       "createdAt": "2026-02-10T10:20:00Z",
       "updatedAt": "2026-02-10T10:20:00Z",
-      "rating": 4.5,
+      "rate": 4.5,
       "tags": [
         "technology",
         "programming",
@@ -285,7 +285,7 @@
       "content": "Prendersi cura della salute mentale è fondamentale. In questo articolo parliamo di piccoli gesti quotidiani che possono migliorare il nostro benessere psicologico.",
       "createdAt": "2026-02-11T09:10:00Z",
       "updatedAt": "2026-02-11T09:10:00Z",
-      "rating": 5,
+      "rate": 5,
       "tags": [
         "health",
         "mental",
@@ -313,7 +313,7 @@
       "content": "Mangiare sano non significa rinunciare al gusto. In questo post spiego come costruire un’alimentazione equilibrata partendo da piccoli cambiamenti.",
       "createdAt": "2026-02-12T10:45:00Z",
       "updatedAt": "2026-02-12T10:45:00Z",
-      "rating": 3,
+      "rate": 3,
       "tags": [
         "health",
         "nutrition",
