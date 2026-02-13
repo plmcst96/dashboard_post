@@ -16,6 +16,7 @@ import { theme } from "../main";
 import { useAuthStore } from "../auth/auth.store";
 import SlateEditor, { type CustomElement } from "./SlateEditor";
 import type { Descendant } from "slate";
+import { fileToBase64 } from "../utils/function";
 
 type Props = {
   open: boolean;
@@ -36,15 +37,6 @@ export default function PostDrawer({ open, setOpen }: Props) {
   ]);
 
   const toggleDrawer = (newOpen: boolean) => () => setOpen(newOpen);
-
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   const handleSave = (status: string) => {
     const content = JSON.stringify(value);

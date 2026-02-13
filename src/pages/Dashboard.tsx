@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   Avatar,
   Box,
@@ -24,18 +24,9 @@ import EdgesensorLowOutlinedIcon from "@mui/icons-material/EdgesensorLowOutlined
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import CalendarViewMonthOutlinedIcon from "@mui/icons-material/CalendarViewMonthOutlined";
 import { usePostStore } from "../store/post";
-import travel1 from "../assets/posts/travel1.jpg";
-import travel2 from "../assets/posts/travel2.jpg";
-import food1 from "../assets/posts/food1.jpg";
-import food2 from "../assets/posts/food2.jpg";
-import fashion1 from "../assets/posts/fashion1.jpg";
-import fashion2 from "../assets/posts/fashion2.jpg";
-import tech1 from "../assets/posts/tech1.jpg";
-import tech2 from "../assets/posts/tech2.jpg";
-import health1 from "../assets/posts/health1.jpg";
-import health2 from "../assets/posts/health2.jpg";
 import { useNavigate } from "react-router";
 import { useLayoutStore } from "../store/useLayoutStore";
+import { extractTextFromSlate, getPostImage, handleCardColor } from "../utils/function";
 
 export const DashboardPage = () => {
   const posts = usePostStore((state) => state.posts);
@@ -49,20 +40,7 @@ export const DashboardPage = () => {
     (state) => state.setSelectedCategory,
   );
 
-  const imageMap: Record<string, string> = {
-    "travel1.jpg": travel1,
-    "travel2.jpg": travel2,
-    "food1.jpg": food1,
-    "food2.jpg": food2,
-    "fashion1.jpg": fashion1,
-    "fashion2.jpg": fashion2,
-    "tech1.jpg": tech1,
-    "tech2.jpg": tech2,
-    "health1.jpg": health1,
-    "health2.jpg": health2,
-  };
-
-  const category = [
+ const category = [
     {
       name: "All",
       color: "#fdd58b",
@@ -107,22 +85,6 @@ export const DashboardPage = () => {
     },
   ];
 
-  const handleCardColor = (category: string) => {
-    switch (category) {
-      case "Travel":
-        return "#F4D55D";
-      case "Food":
-        return "#FFACA0";
-      case "Fashion":
-        return "#b1e89b";
-      case "Technology":
-        return "#cccefd";
-      case "Health":
-        return "#b6ebfc";
-      default:
-        return "#fdd58b";
-    }
-  };
 
   useEffect(() => {
     fetchPosts();
@@ -139,36 +101,6 @@ export const DashboardPage = () => {
       .includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
   });
-
-  const extractTextFromSlate = (content: string): string => {
-    try {
-      const nodes = JSON.parse(content);
-      return nodes
-        .map((n: any) => n.children?.map((c: any) => c.text).join(""))
-        .join(" ");
-    } catch {
-      return "";
-    }
-  };
-
-  const getPostImage = (image?: string) => {
-  if (!image) return health1;
-
-  // ✅ Caso Base64
-  if (image.startsWith("data:image")) {
-    return image;
-  }
-
-  // ✅ Caso path del db: "../assets/posts/health2.jpg"
-  const fileName = image.split("/").pop() || "";
-
-  if (imageMap[fileName]) {
-    return imageMap[fileName];
-  }
-
-  // ❌ fallback finale
-  return health1;
-};
 
   return (
     <PageLayout>

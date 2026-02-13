@@ -1,6 +1,6 @@
 import { useAuthStore } from "../auth/auth.store";
 import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
+
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
 import IconButton from "@mui/material/IconButton";
@@ -8,7 +8,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { styled, Typography, useTheme } from "@mui/material";
+import { Typography, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
@@ -19,30 +19,8 @@ import { useLayoutStore } from "../store/useLayoutStore";
 import logo from "../assets/logo.png";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useEffect, useMemo } from "react";
+import { drawerWidth, FloatingDrawer } from "../utils/styleMUI";
 
-const drawerWidth = 280;
-
-const FloatingDrawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<{ open?: boolean }>(({ theme, open }) => ({
-  flexShrink: 0,
-  width: open ? drawerWidth : 120,
-  height: "99vh",
-  position: "fixed",
-  top: 0,
-  left: 0,
-
-  "& .MuiDrawer-paper": {
-    width: open ? drawerWidth : 120,
-    height: "99vh",
-    borderRadius: 16,
-    boxShadow: theme.shadows[8],
-    backgroundColor: theme.palette.primary.contrastText,
-    overflow: "hidden", // 👈 niente scroll nel drawer
-    position: "relative",
-    margin: 6,
-  },
-}));
 
 type Props = {
   children: React.ReactNode;
@@ -267,7 +245,7 @@ export const PageLayout = ({ children }: Props) => {
             backgroundColor: theme.palette.background.paper,
           }}
         >
-          <span style={{ marginLeft: 12 }}>© 2026 My Admin</span>
+          <span style={{ marginLeft: 12, marginRight:12 }}>© 2026 My Admin</span>
           <span>v1.0.0</span>
         </Box>
       </Box>

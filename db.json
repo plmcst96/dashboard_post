@@ -173,7 +173,7 @@
       "content": "La moda primavera 2026 punta su colori naturali, tessuti sostenibili e linee comode. In questo articolo analizziamo le principali tendenze viste sulle passerelle e come adattarle alla vita quotidiana, senza rinunciare allo stile.",
       "createdAt": "2026-02-07T10:00:00Z",
       "updatedAt": "2026-02-07T10:00:00Z",
-      "rate":5,
+      "rate": 5,
       "tags": [
         "fashion",
         "trends",
@@ -335,36 +335,20 @@
       ]
     },
     {
-      "id": "1934",
-      "userId": 1,
-      "title": "Frasi, aforismi e citazioni sul Benessere e la Salute",
-      "content": "[{\"type\":\"heading-two\",\"children\":[{\"text\":\"Test\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]",
-      "createdAt": "2026-02-11T16:10:59.289Z",
-      "updatedAt": "2026-02-11T16:10:59.289Z",
-      "tags": [
-        "Frasi",
-        "Healt",
-        "Author"
-      ],
-      "timeLecture": 6,
-      "image": "",
-      "category": "Health",
-      "status": "draft"
-    },
-    {
-      "id": 1935,
-      "userId": "1",
+      "id": "c756",
+      "userId": "2",
       "title": "Test",
-      "content": "[{\"type\":\"heading-one\",\"children\":[{\"text\":\"Test\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"Prova \"},{\"text\":\"prova\",\"bold\":true}]},{\"type\":\"numbered-list\",\"children\":[{\"bold\":true,\"text\":\"test\"}]},{\"type\":\"numbered-list\",\"children\":[{\"text\":\"eeee\"}]},{\"type\":\"numbered-list\",\"children\":[{\"text\":\"eeeee\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"ssdsdsdsdsd\"}]}]",
-      "createdAt": "2026-02-11T16:36:10.555Z",
-      "updatedAt": "2026-02-11T16:36:10.555Z",
+      "content": "[{\"type\":\"paragraph\",\"children\":[{\"text\":\"Test\"}]}]",
+      "createdAt": "2026-02-13T17:20:12.710Z",
+      "updatedAt": "2026-02-13T17:30:46.417Z",
       "tags": [
-        "emme"
+        "test1"
       ],
-      "timeLecture": 3,
-      "image": "C:\\fakepath\\Screenshot 2026-02-09 171525.png",
-      "category": "Travel",
-      "status": "draft"
+      "timeLecture": 4,
+      "rate": 0,
+      "image": "",
+      "category": "Food",
+      "status": "published"
     }
   ]
 }

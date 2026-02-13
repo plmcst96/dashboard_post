@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { api } from "../api/axios";
 import axios from "axios";
 
-type Comment = {
+export type Comment = {
   id: number;
   postId: number;
   userId: number;
@@ -12,7 +12,7 @@ type Comment = {
 };
 
 export type Post = {
-  id: number;
+  id: string;
   userId: number;
   title: string;
   content: string;
@@ -30,191 +30,150 @@ export type Post = {
 type CrudState = {
   loading: boolean;
   error: string | null;
+  success: string | null;
 };
 
-type PostState = {
+type PostStore = {
   posts: Post[];
   post: Post | null;
-  nextId: number; // for mock ID generation
+  nextId: number;
 
-
-  // ---- CRUD STATE ----
   fetchState: CrudState;
   postState: CrudState;
   updateState: CrudState;
   deleteState: CrudState;
 
-  // ---- GETTERS ----
-  getPostById: (id: number) => Post | undefined;
+  getPostById: (id: string) => Post | undefined;
   getPostsByCategory: (category: Post["category"]) => Post[];
 
-  // ---- CRUD OPERATIONS ----
   fetchPosts: () => Promise<void>;
-  fetchPost: (id: number) => Promise<void>;
-  addPost: (post: Omit<Post, "id">) => void;
-  updatePost: (id: number, data: Partial<Post>) => Promise<void>;
-  deletePost: (id: number) => Promise<void>;
+  fetchPost: (id: string) => Promise<void>;
+  addPost: (post: Omit<Post, "id">) => Promise<void>;
+  updatePost: (id: string, data: Partial<Post>) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
 
-  // ---- COMMENTS handled through posts ----
-  addComment: (postId: number, comment: Comment) => Promise<void>;
-  updateComment: (
-    postId: number,
-    commentId: number,
-    data: Partial<Comment>,
-  ) => Promise<void>;
-  deleteComment: (postId: number, commentId: number) => Promise<void>;
+  addComment: (postId: string, comment: Comment) => Promise<void>;
+  updateComment: (postId: string, commentId: number, data: Partial<Comment>) => Promise<void>;
+  deleteComment: (postId: string, commentId: number) => Promise<void>;
 };
 
-const getErrorMessage = (error: unknown): string => {
-  if (axios.isAxiosError(error)) {
-    return error.response?.data?.message || error.message;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
+const getErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error)) return error.response?.data?.message || error.message;
+  if (error instanceof Error) return error.message;
   return "Something went wrong";
 };
 
-export const usePostStore = create<PostState>((set, get) => ({
+const setCrudState = <K extends "fetchState" | "postState" | "updateState" | "deleteState">(
+  set: (state: Partial<PostStore> | ((prev: PostStore) => Partial<PostStore>)) => void,
+  key: K,
+  state: Partial<CrudState>
+) => {
+  set((prev) => ({
+    [key]: { ...prev[key], ...state },
+  }));
+};
+
+
+export const usePostStore = create<PostStore>((set, get) => ({
   posts: [],
   post: null,
-  nextId: 10, // starting point for mock IDs
+  nextId: 10,
 
-  // ---- CRUD STATE ----
-  fetchState: { loading: false, error: null },
-  postState: { loading: false, error: null },
-  updateState: { loading: false, error: null },
-  deleteState: { loading: false, error: null },
+  fetchState: { loading: false, error: null, success: null },
+  postState: { loading: false, error: null, success: null },
+  updateState: { loading: false, error: null, success: null },
+  deleteState: { loading: false, error: null, success: null },
 
-  // ---- GETTERS ----
   getPostById: (id) => get().posts.find((p) => p.id === id),
-  getPostsByCategory: (category) =>
-    get().posts.filter((p) => p.category === category),
+  getPostsByCategory: (category) => get().posts.filter((p) => p.category === category),
 
-  // ---- FETCH ----
- fetchPosts: async () => {
-  set({ fetchState: { loading: true, error: null } });
-  try {
-    const res = await api.get("/posts");
-    const posts: Post[] = res.data;
-
-    const maxId = posts.length
-      ? Math.max(...posts.map((p) => p.id))
-      : 9;
-
-    set({
-      posts,
-      nextId: maxId + 1, // 👈 mantiene la sequenza
-      fetchState: { loading: false, error: null },
-    });
-  } catch (error: unknown) {
-    set({
-      fetchState: {
-        loading: false,
-        error: getErrorMessage(error),
-      },
-    });
-  }
-},
-
+  fetchPosts: async () => {
+    setCrudState(set, "fetchState", { loading: true, error: null, success: null });
+    try {
+      const res = await api.get<Post[]>("/posts");
+      const posts = res.data;
+      set({
+        posts,
+        fetchState: { loading: false, error: null, success: "Posts fetched successfully" },
+      });
+    } catch (error) {
+      setCrudState(set, "fetchState", { loading: false, error: getErrorMessage(error) });
+    }
+  },
 
   fetchPost: async (id) => {
-    set({ postState: { loading: true, error: null } });
+    setCrudState(set, "postState", { loading: true, error: null, success: null });
     try {
-      const res = await api.get(`/posts/${id}`);
-      set({ post: res.data, postState: { loading: false, error: null } });
-    } catch (error: unknown) {
+      const res = await api.get<Post>(`/posts/${id}`);
       set({
-        fetchState: {
-          loading: false,
-          error: getErrorMessage(error),
-        },
+        post: res.data,
+        postState: { loading: false, error: null, success: "Post fetched successfully" },
       });
+    } catch (error) {
+      setCrudState(set, "postState", { loading: false, error: getErrorMessage(error) });
     }
   },
 
-  // ---- ADD POST ----
- addPost: async (post) => {
-  set({ postState: { loading: true, error: null } });
-
+  addPost: async (post) => {
+  setCrudState(set, "postState", { loading: true, error: null, success: null });
   try {
-    const id = get().nextId;
+    // NON impostare id manualmente
+    const res = await api.post<Post>("/posts", post); 
+    const newPost = res.data; // JSON Server ti restituisce il post completo con id
 
-    const newPost: Post = {
-      ...post,
-      id,
-    };
-
-    // 🔹 se usi API reale
-    await api.post("/posts", newPost);
-
-    // 🔹 aggiorna store locale
     set((state) => ({
       posts: [...state.posts, newPost],
-      nextId: state.nextId + 1, // 👈 incrementa
-      postState: { loading: false, error: null },
+      postState: { loading: false, error: null, success: "Post added successfully" },
     }));
-  } catch (error: unknown) {
-    set({
-      postState: {
-        loading: false,
-        error: getErrorMessage(error),
-      },
-    });
+  } catch (error) {
+    setCrudState(set, "postState", { loading: false, error: getErrorMessage(error) });
   }
 },
 
 
-  // ---- UPDATE POST ----
   updatePost: async (id, data) => {
-    set({ updateState: { loading: true, error: null } });
+    setCrudState(set, "updateState", { loading: true, error: null, success: null });
     try {
-      const post = get().posts.find((p) => p.id === id);
-      if (!post) throw new Error("Post not found");
-      const updated = { ...post, ...data };
-      await api.put(`/posts/${id}`, updated);
+      const existingPost = get().posts.find((p) => p.id === id) || get().post;
+if (!existingPost) throw new Error("Post not found");
+
+      const updatedPost: Post = { ...existingPost, ...data, updatedAt: new Date().toISOString() };
+      await api.put(`/posts/${id}`, updatedPost);
+
       set((state) => ({
-        posts: state.posts.map((p) => (p.id === id ? updated : p)),
-        updateState: { loading: false, error: null },
+        posts: state.posts.map((p) => (p.id === id ? updatedPost : p)),
+        post: state.post?.id === id ? updatedPost : state.post,
+        updateState: { loading: false, error: null, success: "Post updated successfully ✅" },
       }));
-    } catch (error: unknown) {
-      set({
-        fetchState: {
-          loading: false,
-          error: getErrorMessage(error),
-        },
-      });
+    } catch (error) {
+      setCrudState(set, "updateState", { loading: false, error: getErrorMessage(error) });
     }
   },
 
-  // ---- DELETE POST ----
   deletePost: async (id) => {
-    set({ deleteState: { loading: true, error: null } });
+    setCrudState(set, "deleteState", { loading: true, error: null, success: null });
     try {
       await api.delete(`/posts/${id}`);
       set((state) => ({
         posts: state.posts.filter((p) => p.id !== id),
-        deleteState: { loading: false, error: null },
+        deleteState: { loading: false, error: null, success: "Post deleted!" },
       }));
-    } catch (error: unknown) {
-      set({
-        fetchState: {
-          loading: false,
-          error: getErrorMessage(error),
-        },
-      });
+    } catch (error) {
+      setCrudState(set, "deleteState", { loading: false, error: getErrorMessage(error) });
     }
   },
 
-  // ---- COMMENTS (CRUD) ----
   addComment: async (postId, comment) => {
     try {
       const post = get().posts.find((p) => p.id === postId);
       if (!post) throw new Error("Post not found");
-      const updated = { ...post, comments: [...(post.comments || []), comment] };
-      await api.put(`/posts/${postId}`, updated);
+
+      const updatedPost = { ...post, comments: [...(post.comments || []), comment] };
+      await api.put(`/posts/${postId}`, updatedPost);
+
       set((state) => ({
-        posts: state.posts.map((p) => (p.id === postId ? updated : p)),
+        posts: state.posts.map((p) => (p.id === postId ? updatedPost : p)),
+        post: state.post?.id === postId ? updatedPost : state.post,
       }));
     } catch (error) {
       console.error("Add comment error:", error);
@@ -225,13 +184,14 @@ export const usePostStore = create<PostState>((set, get) => ({
     try {
       const post = get().posts.find((p) => p.id === postId);
       if (!post) throw new Error("Post not found");
-      const updatedComments = post.comments?.map((c) =>
-        c.id === commentId ? { ...c, ...data } : c,
-      );
+
+      const updatedComments = post.comments?.map((c) => (c.id === commentId ? { ...c, ...data } : c));
       const updatedPost = { ...post, comments: updatedComments };
       await api.put(`/posts/${postId}`, updatedPost);
+
       set((state) => ({
         posts: state.posts.map((p) => (p.id === postId ? updatedPost : p)),
+        post: state.post?.id === postId ? updatedPost : state.post,
       }));
     } catch (error) {
       console.error("Update comment error:", error);
@@ -242,11 +202,14 @@ export const usePostStore = create<PostState>((set, get) => ({
     try {
       const post = get().posts.find((p) => p.id === postId);
       if (!post) throw new Error("Post not found");
+
       const updatedComments = post.comments?.filter((c) => c.id !== commentId);
       const updatedPost = { ...post, comments: updatedComments };
       await api.put(`/posts/${postId}`, updatedPost);
+
       set((state) => ({
         posts: state.posts.map((p) => (p.id === postId ? updatedPost : p)),
+        post: state.post?.id === postId ? updatedPost : state.post,
       }));
     } catch (error) {
       console.error("Delete comment error:", error);

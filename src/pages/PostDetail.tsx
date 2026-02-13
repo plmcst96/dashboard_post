@@ -1,12 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  Alert,
   Avatar,
   Box,
   Breadcrumbs,
   Button,
   Card,
   CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   Grid,
   IconButton,
@@ -14,24 +19,13 @@ import {
   MenuItem,
   Rating,
   Select,
-  styled,
   TextField,
   Typography,
 } from "@mui/material";
 import { usePostStore, type Post } from "../store/post";
 import { PageLayout } from "../components/PageLayout";
-import travel1 from "../assets/posts/travel1.jpg";
-import travel2 from "../assets/posts/travel2.jpg";
-import food1 from "../assets/posts/food1.jpg";
-import food2 from "../assets/posts/food2.jpg";
-import fashion1 from "../assets/posts/fashion1.jpg";
-import fashion2 from "../assets/posts/fashion2.jpg";
-import tech1 from "../assets/posts/tech1.jpg";
-import tech2 from "../assets/posts/tech2.jpg";
-import health1 from "../assets/posts/health1.jpg";
-import health2 from "../assets/posts/health2.jpg";
+
 import { useEffect, useState } from "react";
-import Switch, { type SwitchProps } from "@mui/material/Switch";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 import avatar from "../assets/avatar_25.jpg";
 import { useUserStore } from "../store/users";
@@ -46,70 +40,27 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
-
-const IOSSwitch = styled((props: SwitchProps) => (
-  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
-))(({ theme }) => ({
-  width: 42,
-  height: 26,
-  padding: 0,
-  "& .MuiSwitch-switchBase": {
-    padding: 0,
-    margin: 2,
-    transitionDuration: "300ms",
-    "&.Mui-checked": {
-      transform: "translateX(16px)",
-      color: "#fff",
-      "& + .MuiSwitch-track": {
-        backgroundColor: "#F4D55D",
-        opacity: 1,
-        border: 0,
-        ...theme.applyStyles("dark", {
-          backgroundColor: "#F4D55D",
-        }),
-      },
-      "&.Mui-disabled + .MuiSwitch-track": {
-        opacity: 0.5,
-      },
-    },
-    "&.Mui-focusVisible .MuiSwitch-thumb": {
-      color: "#F4D55D",
-      border: "6px solid #fff",
-    },
-    "&.Mui-disabled .MuiSwitch-thumb": {
-      color: theme.palette.grey[100],
-      ...theme.applyStyles("dark", {
-        color: theme.palette.grey[600],
-      }),
-    },
-    "&.Mui-disabled + .MuiSwitch-track": {
-      opacity: 0.7,
-      ...theme.applyStyles("dark", {
-        opacity: 0.3,
-      }),
-    },
-  },
-  "& .MuiSwitch-thumb": {
-    boxSizing: "border-box",
-    width: 22,
-    height: 22,
-  },
-  "& .MuiSwitch-track": {
-    borderRadius: 26 / 2,
-    backgroundColor: "#E9E9EA",
-    opacity: 1,
-    transition: theme.transitions.create(["background-color"], {
-      duration: 500,
-    }),
-    ...theme.applyStyles("dark", {
-      backgroundColor: "#39393D",
-    }),
-  },
-}));
+import {
+  categoryColors,
+  fileToBase64,
+  formatDate,
+  formatDate1,
+  getPostImage,
+} from "../utils/function";
+import { IOSSwitch } from "../utils/styleMUI";
+import { PostContent } from "../components/PostContent";
 
 export const PostDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { post, fetchPost, fetchState } = usePostStore();
+  const {
+    post,
+    fetchPost,
+    fetchState,
+    updatePost,
+    updateState,
+    deletePost,
+    deleteState,
+  } = usePostStore();
   const [edit, setEdit] = useState(false);
   const { user, fetchUser, fetchUsers, users } = useUserStore();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -117,19 +68,37 @@ export const PostDetailsPage = () => {
   const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
   const open1 = Boolean(anchorEl1);
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<string[]>("");
+  const [tags, setTags] = useState<string[]>([]);
   const [timeLecture, setTimeLecture] = useState(0);
   const [image, setImage] = useState("");
   const [category, setCategory] = useState<Post["category"]>("Travel");
   const [contentValue, setContentValue] = useState<Descendant[]>([]);
   const [selectedUser, setSelectedUser] = useState(0);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const navigate = useNavigate();
+  const [openComment, setOpenComment] = useState(false)
+
+  //state iniziale dati
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    fetchPost(id!);
+  }, [fetchPost, id]);
+
+  useEffect(() => {
+    if (post?.userId) {
+      fetchUser(post.userId);
+    }
+  }, [fetchUser, post?.userId]);
 
   const handleToggleEdit = () => {
     if (!edit && post) {
       setTitle(post.title);
-      setTags(post.tags);
+      setTags(post.tags || []);
       setTimeLecture(post.timeLecture);
-      setImage(post.image);
+      setImage("");
       setCategory(post.category);
       setSelectedUser(post.userId);
 
@@ -150,6 +119,7 @@ export const PostDetailsPage = () => {
     setEdit((prev) => !prev);
   };
 
+  //apre e chiude menu commenti
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -157,6 +127,8 @@ export const PostDetailsPage = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  //apre e chiude menu per cambiare autore
   const handleClick1 = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl1(event.currentTarget);
   };
@@ -165,20 +137,20 @@ export const PostDetailsPage = () => {
     setAnchorEl1(null);
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const handleOpenDeleteDialog = () => {
+    setOpenDeleteDialog(true);
+  };
 
-  useEffect(() => {
-    fetchPost(Number(id));
-  }, [fetchPost, id]);
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
 
-  useEffect(() => {
-    if (post?.userId) {
-      fetchUser(post.userId);
-    }
-  }, [fetchUser, post?.userId]);
+  const handleConfirmDelete = () => {
+    handleDelete();
+    setOpenDeleteDialog(false);
+  };
 
+  //render pagina il loading ed error
   if (fetchState.loading) {
     return (
       <Box sx={{ p: 4 }}>
@@ -195,89 +167,150 @@ export const PostDetailsPage = () => {
     );
   }
 
-  const imageMap: Record<string, string> = {
-    "travel1.jpg": travel1,
-    "travel2.jpg": travel2,
-    "food1.jpg": food1,
-    "food2.jpg": food2,
-    "fashion1.jpg": fashion1,
-    "fashion2.jpg": fashion2,
-    "tech1.jpg": tech1,
-    "tech2.jpg": tech2,
-    "health1.jpg": health1,
-    "health2.jpg": health2,
+  //handle per i tag in fase di edit
+  const handleRemoveTag = (index: number) => {
+    setTags((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const extractTextFromSlate = (content: string): string => {
-    try {
-      const nodes = JSON.parse(content);
-      return nodes
-        .map((n: any) => n.children?.map((c: any) => c.text).join(""))
-        .join(" ");
-    } catch {
-      return "";
+  const handleAddTag = () => {
+    const newTag = prompt("Insert new tag");
+    if (newTag && newTag.trim() !== "") {
+      setTags((prev) => [...prev, newTag.trim()]);
     }
-  };
-
-  const getPostImage = (image?: string) => {
-    if (!image) return health1;
-
-    // ✅ Caso Base64
-    if (image.startsWith("data:image")) {
-      return image;
-    }
-
-    // ✅ Caso path del db: "../assets/posts/health2.jpg"
-    const fileName = image.split("/").pop() || "";
-
-    if (imageMap[fileName]) {
-      return imageMap[fileName];
-    }
-
-    // ❌ fallback finale
-    return health1;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-
-    const day = date.getDate();
-    const month = date.toLocaleString("en-US", { month: "short" });
-    const year = date.getFullYear();
-
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-
-    return `${day} ${month} ${year} - ${hours}:${minutes} ${ampm}`;
-  };
-
-  const formatDate1 = (dateString: string) => {
-    const date = new Date(dateString);
-
-    const day = date.getDate();
-    const month = date.toLocaleString("en-US", { month: "short" });
-    const year = date.getFullYear();
-
-    return `${day} ${month} ${year}`;
   };
 
   const displayedAuthor = edit
     ? users.find((u) => u.id === selectedUser)
     : user;
 
-  const categoryColors: Record<Post["category"], string> = {
-    Travel: "#F4D55D",
-    Food: "#FFACA0",
-    Fashion: "#b1e89b",
-    Technology: "#cccefd",
-    Health: "#b6ebfc",
+  //handle image in fase di edit
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // ✅ validazione tipo
+    if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+      alert("Only JPG and PNG images are allowed");
+      return;
+    }
+
+    // ✅ validazione size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be smaller than 2MB");
+      return;
+    }
+
+    const base64 = await fileToBase64(file);
+    setImage(base64);
+  };
+
+  const handleUpdate = async (status: string) => {
+    if (!post) return;
+
+    // Reset update state
+    usePostStore.setState((state) => ({
+      updateState: {
+        ...state.updateState,
+        error: null,
+        success: null,
+        loading: true,
+      },
+    }));
+
+    try {
+      await updatePost(id!, {
+        userId: selectedUser,
+        title,
+        content: JSON.stringify(contentValue),
+        tags,
+        timeLecture: Number(timeLecture),
+        image: image || post.image,
+        category,
+        status: status as Post["status"],
+      });
+
+      // Aggiorna i dati del post
+      await fetchPost(id!);
+
+      // Chiude edit solo se tutto è andato a buon fine
+      setEdit(false);
+
+      // Mostra messaggio di successo temporaneo
+      const timer = setTimeout(() => {
+        usePostStore.setState((state) => ({
+          updateState: { ...state.updateState, success: null },
+        }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    } catch (err) {
+      // Mostra errore temporaneo e non chiude edit
+      const errorMessage =
+        err instanceof Error ? err.message : "Something went wrong";
+
+      usePostStore.setState((state) => ({
+        updateState: {
+          ...state.updateState,
+          error: errorMessage,
+          loading: false,
+        },
+      }));
+
+      const timer = setTimeout(() => {
+        usePostStore.setState((state) => ({
+          updateState: { ...state.updateState, error: null },
+        }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  };
+
+  const handleDelete = () => {
+    usePostStore.setState((state) => ({
+      deleteState: {
+        ...state.deleteState,
+        error: null,
+        success: null,
+        loading: true,
+      },
+    }));
+    try {
+      deletePost(id!);
+      setEdit(false);
+
+      // Mostra messaggio di successo temporaneo
+      const timer = setTimeout(() => {
+        usePostStore.setState((state) => ({
+          deleteState: { ...state.deleteState, success: null },
+        }));
+        navigate("/");
+      }, 3000);
+      return () => clearTimeout(timer);
+    } catch (err) {
+      // Mostra errore temporaneo e non chiude edit
+      const errorMessage =
+        err instanceof Error ? err.message : "Something went wrong";
+
+      usePostStore.setState((state) => ({
+        deleteState: {
+          ...state.deleteState,
+          error: errorMessage,
+          loading: false,
+        },
+      }));
+
+      const timer = setTimeout(() => {
+        usePostStore.setState((state) => ({
+          deleteState: { ...state.deleteState, error: null },
+        }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
   };
 
   return (
     <PageLayout>
       <Box>
+        {/*HEADER POST DETAIL*/}
         <Box display="flex" flexDirection="row" justifyContent="space-between">
           <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
             <Typography
@@ -323,7 +356,9 @@ export const PostDetailsPage = () => {
           </Box>
         </Box>
         <Grid container spacing={3} sx={{ flexGrow: 1, minHeight: 0 }}>
+          {/*COLONNA SINISTRA*/}
           <Grid size={{ xs: 12, md: 8 }} sx={{ p: 4 }}>
+            {/*CARD POST DETAIL*/}
             <Card elevation={3} sx={{ p: 4, borderRadius: 3 }}>
               {edit ? (
                 <Select
@@ -382,20 +417,62 @@ export const PostDetailsPage = () => {
                   </Typography>
                 </Box>
               )}
+              {edit ? (
+                <Box>
+                  <TextField
+                    type="file"
+                    inputProps={{ accept: "image/png, image/jpeg" }}
+                    onChange={handleImageUpload}
+                    fullWidth
+                    margin="normal"
+                    sx={{
+                      "& .MuiOutlinedInput-root": { borderRadius: "30px" },
+                    }}
+                  />
 
-              <CardMedia
-                component="img"
-                image={getPostImage(post.image)}
-                alt={post.title}
-                sx={{
-                  height: 400,
-                  objectFit: "cover",
-                  objectPosition: "top",
-                  borderRadius: 3,
-                  mt: 3,
-                  backgroundColor: "#f5f5f5", // opzionale, evita spazio bianco brutto
-                }}
-              />
+                  <Box sx={{ position: "relative", mt: 2 }}>
+                    <CardMedia
+                      component="img"
+                      image={image ? image : getPostImage(post.image)}
+                      alt={title}
+                      sx={{
+                        height: 400,
+                        objectFit: "cover",
+                        borderRadius: 3,
+                      }}
+                    />
+
+                    {image && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => setImage("")}
+                        sx={{
+                          position: "absolute",
+                          top: 12,
+                          right: 12,
+                          borderRadius: 5,
+                        }}
+                      >
+                        Remove image
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
+              ) : (
+                <CardMedia
+                  component="img"
+                  image={getPostImage(post.image)}
+                  alt={post.title}
+                  sx={{
+                    height: 400,
+                    objectFit: "cover",
+                    borderRadius: 3,
+                    mt: 3,
+                  }}
+                />
+              )}
 
               {edit ? (
                 <Box
@@ -418,9 +495,9 @@ export const PostDetailsPage = () => {
                 </Box>
               ) : (
                 <Typography component="div" variant="body1" sx={{ mt: 4 }}>
-                  <Typography>
-                    {post.content || extractTextFromSlate(post.content)}
-                  </Typography>
+                  <Box sx={{ mt: 4 }}>
+                    <PostContent content={post.content} />
+                  </Box>
 
                   <Typography>
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Est
@@ -438,20 +515,27 @@ export const PostDetailsPage = () => {
                 </Typography>
               )}
             </Card>
+            {/*CARD comment*/}
             <Card elevation={3} sx={{ p: 4, borderRadius: 3, mt: 4 }}>
               <Box>
                 <Grid container>
                   <Grid
-                    size={{ xs: 12, md: 6 }}
+                    size={{ xs: 12 }}
                     display="flex"
                     flexDirection="row"
+                    justifyContent="space-between"
                   >
-                    <QuestionAnswerOutlinedIcon
+                    <Box display="flex"
+                    flexDirection="row">
+<QuestionAnswerOutlinedIcon
                       sx={{ mr: 2, color: "#F4D55D", fontSize: 30 }}
                     />
                     <Typography variant="h6">
                       Comments ({post.comments?.length})
                     </Typography>
+                    </Box>
+                    <Button variant="contained" onClick={()=>setOpenComment(true)}>Add Comment +</Button>
+                    
                   </Grid>
                   {post.comments?.length && post.comments?.length > 2 ? (
                     <Grid
@@ -544,7 +628,9 @@ export const PostDetailsPage = () => {
               </Box>
             </Card>
           </Grid>
+          {/*COLONNA DESTRA*/}
           <Grid size={{ xs: 12, md: 4 }} sx={{ p: 4 }}>
+            {/*CARD AUTORE*/}
             <Card elevation={3} sx={{ p: 4, borderRadius: 3 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 POST AUTHOR
@@ -613,6 +699,7 @@ export const PostDetailsPage = () => {
                 </Menu>
               )}
             </Card>
+            {/*CARD METADATA*/}
             <Card elevation={3} sx={{ p: 4, borderRadius: 3, mt: 4 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 METADATA & STATS
@@ -687,44 +774,121 @@ export const PostDetailsPage = () => {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 TAGS
               </Typography>
-              <Grid container gap={0.5}
-
-              >
-                {post.tags &&
-                  post.tags.map((t, i) => (
-                    <Grid
-                    size={{xs:5}}
-                      key={i}
-                      sx={{ border: "1px solid", p: 1, borderRadius: 5 }}
-                    >
-                      {edit ? (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent:'space-between'
-                            }}
-                          >
-                            <Typography variant="body2">{t}</Typography>
-                          <ClearOutlinedIcon sx={{ fontSize: 12 }}/>
-                            
-                          </Box>
-                     
-                      ) : (
+              <Grid container gap={0.5}>
+                {(edit ? tags : post.tags)?.map((t, i) => (
+                  <Grid
+                    size={{ xs: 5, lg: 3 }}
+                    key={i}
+                    sx={{ border: "1px solid", p: 1, borderRadius: 5 }}
+                  >
+                    {edit ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          cursor: "pointer",
+                        }}
+                      >
                         <Typography variant="body2">{t}</Typography>
-                      )}
-                    </Grid>
-                  ))}
-                  {
-                    edit && 
-                    <Button variant="contained" sx={{borderRadius:5}}>Add Tag  +</Button>
-                  }
+                        <ClearOutlinedIcon
+                          sx={{ fontSize: 12 }}
+                          onClick={() => handleRemoveTag(i)}
+                        />
+                      </Box>
+                    ) : (
+                      <Typography variant="body2">{t}</Typography>
+                    )}
+                  </Grid>
+                ))}
+                {edit && (
+                  <Button
+                    variant="contained"
+                    sx={{ borderRadius: 5 }}
+                    onClick={handleAddTag}
+                  >
+                    Add Tag +
+                  </Button>
+                )}
               </Grid>
             </Card>
+            {updateState.error && (
+              <Alert sx={{ mt: 2 }} severity="error">
+                {updateState.error}
+              </Alert>
+            )}
+            {updateState.success && (
+              <Alert sx={{ mt: 2 }} severity="success">
+                {updateState.success}
+              </Alert>
+            )}
+
+            {deleteState.error && (
+              <Alert sx={{ mt: 2 }} severity="error">
+                {deleteState.error}
+              </Alert>
+            )}
+            {deleteState.success && (
+              <Alert sx={{ mt: 2 }} severity="success">
+                {deleteState.success}
+              </Alert>
+            )}
+
+            {edit && (
+              <Card elevation={3} sx={{ p: 4, borderRadius: 3, mt: 4 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                  ADMIN ACTIONS
+                </Typography>
+                <Grid container gap={2} mt={2}>
+                  <Grid size={{ xs: 12, md: 5 }}>
+                    <Button fullWidth variant="contained" sx={{borderRadius:6}} onClick={() => handleUpdate(post.status)}>
+                      Save Changes
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 5 }}>
+                    <Button fullWidth variant="contained" sx={{borderRadius:6}} onClick={() => handleUpdate("published")}>
+                      Publish
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 5 }}>
+                    <Button color="error" fullWidth variant="contained" sx={{borderRadius:6}} onClick={handleOpenDeleteDialog}>
+                      Delete
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Card>
+            )}
           </Grid>
         </Grid>
       </Box>
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this post?
+            <br />
+            <strong>This action cannot be undone.</strong>
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PageLayout>
   );
 };

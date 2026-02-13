@@ -146,10 +146,10 @@ const MarkButton = ({
         toggleMark(editor, format);
       }}
       sx={{
-        minWidth: 0, // rimuove la larghezza minima
-        padding: 0, // niente padding
-        width: 32, // larghezza uguale all’icona
-        height: 32, // altezza uguale all’icona
+        minWidth: 0,
+        padding: 0,
+        width: 32,
+        height: 32,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -236,150 +236,132 @@ const AlignButton = ({
   );
 };
 
-type Props ={
-    value: Descendant[],
-    setValue: (value: Descendant[]) => void
+type Props = {
+  value: Descendant[];
+  setValue: (value: Descendant[]) => void;
 };
 
-export default function SlateEditor({setValue, value} : Props){
-    const editor = useMemo(
-        () => withHistory(withReact(createEditor() as CustomEditor)),
-        [],
-      );
-    return (
-        <Slate editor={editor} initialValue={value} onChange={setValue}>
-              <Box mb={1} display="flex">
-                {/* Marks */}
-                <MarkButton
-                  editor={editor}
-                  format="bold"
-                  label={<FormatBoldIcon />}
-                ></MarkButton>
-                <MarkButton
-                  editor={editor}
-                  format="italic"
-                  label={<FormatItalicIcon />}
-                />
-                <MarkButton
-                  editor={editor}
-                  format="underline"
-                  label={<FormatUnderlinedIcon />}
-                />
+export default function SlateEditor({ setValue, value }: Props) {
+  const editor = useMemo(
+    () => withHistory(withReact(createEditor() as CustomEditor)),
+    [],
+  );
+  return (
+    <Slate editor={editor} initialValue={value} onChange={setValue}>
+      <Box mb={1} display="flex">
+        {/* Marks */}
+        <MarkButton
+          editor={editor}
+          format="bold"
+          label={<FormatBoldIcon />}
+        ></MarkButton>
+        <MarkButton
+          editor={editor}
+          format="italic"
+          label={<FormatItalicIcon />}
+        />
+        <MarkButton
+          editor={editor}
+          format="underline"
+          label={<FormatUnderlinedIcon />}
+        />
 
-                {/* Blocks */}
-                <BlockButton
-                  editor={editor}
-                  format="heading-one"
-                  label={<LooksOneIcon />}
-                />
-                <BlockButton
-                  editor={editor}
-                  format="heading-two"
-                  label={<LooksTwoIcon />}
-                />
-                <BlockButton
-                  editor={editor}
-                  format="heading-three"
-                  label={<Looks3Icon />}
-                />
-                <BlockButton editor={editor} format="paragraph" label="P" />
-                <BlockButton
-                  editor={editor}
-                  format="numbered-list"
-                  label={<FormatListNumberedIcon />}
-                />
-                <BlockButton
-                  editor={editor}
-                  format="bulleted-list"
-                  label={<FormatListBulletedIcon />}
-                />
+        {/* Blocks */}
+        <BlockButton
+          editor={editor}
+          format="heading-one"
+          label={<LooksOneIcon />}
+        />
+        <BlockButton
+          editor={editor}
+          format="heading-two"
+          label={<LooksTwoIcon />}
+        />
+        <BlockButton
+          editor={editor}
+          format="heading-three"
+          label={<Looks3Icon />}
+        />
+        <BlockButton editor={editor} format="paragraph" label="P" />
+        <BlockButton
+          editor={editor}
+          format="numbered-list"
+          label={<FormatListNumberedIcon />}
+        />
+        <BlockButton
+          editor={editor}
+          format="bulleted-list"
+          label={<FormatListBulletedIcon />}
+        />
 
-                {/* Alignment */}
-                <AlignButton
-                  editor={editor}
-                  align="left"
-                  label={<FormatAlignLeftIcon />}
-                />
-                <AlignButton
-                  editor={editor}
-                  align="center"
-                  label={<FormatAlignCenterIcon />}
-                />
-                <AlignButton
-                  editor={editor}
-                  align="right"
-                  label={<FormatAlignRightIcon />}
-                />
-              </Box>
+        {/* Alignment */}
+        <AlignButton
+          editor={editor}
+          align="left"
+          label={<FormatAlignLeftIcon />}
+        />
+        <AlignButton
+          editor={editor}
+          align="center"
+          label={<FormatAlignCenterIcon />}
+        />
+        <AlignButton
+          editor={editor}
+          align="right"
+          label={<FormatAlignRightIcon />}
+        />
+      </Box>
 
-              <Editable
-                style={{ padding: 3 }}
-                placeholder="Write your content..."
-                renderElement={(props: RenderElementProps) => {
-                  const { attributes, children, element } = props;
-                  const el = element as CustomElement;
+      <Editable
+        style={{ padding: 3 }}
+        placeholder="Write your content..."
+        renderElement={(props: RenderElementProps) => {
+          const { attributes, children, element } = props;
+          const el = element as CustomElement;
 
-                  switch (el.type) {
-                    case "heading-one":
-                      return (
-                        <h1
-                          {...attributes}
-                          style={{ textAlign: el.align || "left" }}
-                        >
-                          {children}
-                        </h1>
-                      );
-                    case "heading-two":
-                      return (
-                        <h2
-                          {...attributes}
-                          style={{ textAlign: el.align || "left" }}
-                        >
-                          {children}
-                        </h2>
-                      );
-                    case "heading-three":
-                      return (
-                        <h3
-                          {...attributes}
-                          style={{ textAlign: el.align || "left" }}
-                        >
-                          {children}
-                        </h3>
-                      );
-                    case "bulleted-list":
-                      return (
-                        <ul
-                          {...attributes}
-                          style={{ textAlign: el.align || "left" }}
-                        >
-                          <li>{children}</li>
-                        </ul>
-                      );
+          switch (el.type) {
+            case "heading-one":
+              return (
+                <h1 {...attributes} style={{ textAlign: el.align || "left" }}>
+                  {children}
+                </h1>
+              );
+            case "heading-two":
+              return (
+                <h2 {...attributes} style={{ textAlign: el.align || "left" }}>
+                  {children}
+                </h2>
+              );
+            case "heading-three":
+              return (
+                <h3 {...attributes} style={{ textAlign: el.align || "left" }}>
+                  {children}
+                </h3>
+              );
+            case "bulleted-list":
+              return (
+                <ul {...attributes} style={{ textAlign: el.align || "left" }}>
+                  <li>{children}</li>
+                </ul>
+              );
 
-                    case "numbered-list":
-                      return (
-                        <ol
-                          {...attributes}
-                          style={{ textAlign: el.align || "left" }}
-                        >
-                          <li>{children}</li>
-                        </ol>
-                      );
-                    case "paragraph":
-                    default:
-                      return (
-                        <p
-                          {...attributes}
-                          style={{ textAlign: el.align || "left" }}
-                        >
-                          {children}
-                        </p>
-                      );
-                  }
-                }}
-                renderLeaf={(props: RenderLeafProps) => renderLeaf(props)}
-              />
-            </Slate>
-    )
+            case "numbered-list":
+              return (
+                <ol {...attributes} style={{ textAlign: el.align || "left" }}>
+                  <li>{children}</li>
+                </ol>
+              );
+            case "paragraph":
+            default:
+              return (
+                <p {...attributes} style={{ textAlign: el.align || "left" }}>
+                  {children}
+                </p>
+              );
+          }
+        }}
+        renderLeaf={(props: RenderLeafProps) => renderLeaf(props)}
+      />
+    </Slate>
+  );
 }

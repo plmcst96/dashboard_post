@@ -18,14 +18,7 @@ import { useTableStore } from "../store/post-table";
 import { useNavigate } from "react-router";
 import { useUserStore } from "../store/users";
 import avatar from "../assets/avatar_25.jpg";
-
-const categoryColors: Record<Post["category"], string> = {
-  Travel: "#F4D55D",
-  Food: "#FFACA0",
-  Fashion: "#b1e89b",
-  Technology: "#cccefd",
-  Health: "#b6ebfc",
-};
+import { categoryColors } from "../utils/function";
 
 export const PostsTable = () => {
   const {
