@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useAuthStore } from "./auth.store";
-import { api } from "../api/axios";
 import { useNavigate } from "react-router";
 import img1 from "../assets/img1.jpg";
 import img2 from "../assets/img2.jpg";
@@ -30,25 +29,17 @@ const ImageBox = styled(Paper)({
 });
 
 export const LoginPage = () => {
-  const { email, password, setEmail, setPassword, login, error, setError } =
+  const { email, password, setEmail, setPassword, login, error } =
     useAuthStore();
   const [visualization, setVisualization] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const res = await api.get("/users", { params: { email, password } });
+    const user = await login(email, password);
 
-      if (res.data.length === 0) {
-        setError("Email o password non corretti");
-        return;
-      }
-
-      login(res.data[0]);
+    if (user) {
       navigate("/");
-    } catch {
-      setError("Errore di connessione al server");
     }
   };
 
@@ -153,7 +144,7 @@ export const LoginPage = () => {
 
               <TextField
                 label="Password"
-                type={ visualization ? 'text':"password"}
+                type={visualization ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 fullWidth
@@ -166,17 +157,18 @@ export const LoginPage = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Button  onClick={() => setVisualization((prev) => !prev)}>
-                        {
-                          visualization ? <VisibilityOffOutlinedIcon
-                          color="action"
-                          sx={{ fontSize: 25 }}
-                        /> :<VisibilityOutlinedIcon
-                          color="action"
-                          sx={{ fontSize: 25 }}
-                        />
-                        }
-                        
+                      <Button onClick={() => setVisualization((prev) => !prev)}>
+                        {visualization ? (
+                          <VisibilityOffOutlinedIcon
+                            color="action"
+                            sx={{ fontSize: 25 }}
+                          />
+                        ) : (
+                          <VisibilityOutlinedIcon
+                            color="action"
+                            sx={{ fontSize: 25 }}
+                          />
+                        )}
                       </Button>
                     </InputAdornment>
                   ),

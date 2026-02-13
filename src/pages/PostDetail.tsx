@@ -13,10 +13,12 @@ import {
   Menu,
   MenuItem,
   Rating,
+  Select,
   styled,
+  TextField,
   Typography,
 } from "@mui/material";
-import { usePostStore } from "../store/post";
+import { usePostStore, type Post } from "../store/post";
 import { PageLayout } from "../components/PageLayout";
 import travel1 from "../assets/posts/travel1.jpg";
 import travel2 from "../assets/posts/travel2.jpg";
@@ -40,6 +42,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import React from "react";
 import SlateEditor, { type CustomElement } from "../components/SlateEditor";
 import type { Descendant } from "slate";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 
 const IOSSwitch = styled((props: SwitchProps) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -110,22 +116,38 @@ export const PostDetailsPage = () => {
   const open = Boolean(anchorEl);
   const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
   const open1 = Boolean(anchorEl1);
+  const [title, setTitle] = useState("");
+  const [tags, setTags] = useState<string[]>("");
+  const [timeLecture, setTimeLecture] = useState(0);
+  const [image, setImage] = useState("");
+  const [category, setCategory] = useState<Post["category"]>("Travel");
   const [contentValue, setContentValue] = useState<Descendant[]>([]);
+  const [selectedUser, setSelectedUser] = useState(0);
 
-  const handleEditClick = () => {
-    if (post?.content) {
-      try {
-        setContentValue(JSON.parse(post.content));
-      } catch {
-        setContentValue([
-          {
-            type: "paragraph",
-            children: [{ text: post.content }],
-          } as CustomElement,
-        ]);
+  const handleToggleEdit = () => {
+    if (!edit && post) {
+      setTitle(post.title);
+      setTags(post.tags);
+      setTimeLecture(post.timeLecture);
+      setImage(post.image);
+      setCategory(post.category);
+      setSelectedUser(post.userId);
+
+      if (post.content) {
+        try {
+          setContentValue(JSON.parse(post.content));
+        } catch {
+          setContentValue([
+            {
+              type: "paragraph",
+              children: [{ text: post.content }],
+            } as CustomElement,
+          ]);
+        }
       }
     }
-    setEdit(true);
+
+    setEdit((prev) => !prev);
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -231,6 +253,28 @@ export const PostDetailsPage = () => {
     return `${day} ${month} ${year} - ${hours}:${minutes} ${ampm}`;
   };
 
+  const formatDate1 = (dateString: string) => {
+    const date = new Date(dateString);
+
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+  };
+
+  const displayedAuthor = edit
+    ? users.find((u) => u.id === selectedUser)
+    : user;
+
+  const categoryColors: Record<Post["category"], string> = {
+    Travel: "#F4D55D",
+    Food: "#FFACA0",
+    Fashion: "#b1e89b",
+    Technology: "#cccefd",
+    Health: "#b6ebfc",
+  };
+
   return (
     <PageLayout>
       <Box>
@@ -274,18 +318,71 @@ export const PostDetailsPage = () => {
             <FormControlLabel
               control={<IOSSwitch sx={{ m: 1 }} />}
               label={edit ? "Edit" : "Show"}
-              onChange={handleEditClick}
+              onChange={handleToggleEdit}
             />
           </Box>
         </Box>
         <Grid container spacing={3} sx={{ flexGrow: 1, minHeight: 0 }}>
           <Grid size={{ xs: 12, md: 8 }} sx={{ p: 4 }}>
             <Card elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-              <Box>
-                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                  {post.title}
-                </Typography>
-              </Box>
+              {edit ? (
+                <Select
+                  fullWidth
+                  labelId="category-label"
+                  value={category}
+                  label="Category"
+                  onChange={(e) =>
+                    setCategory(e.target.value as Post["category"])
+                  }
+                  sx={{
+                    borderRadius: "30px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderRadius: "30px",
+                    },
+                  }}
+                >
+                  {["Travel", "Food", "Fashion", "Technology", "Health"].map(
+                    (cat) => (
+                      <MenuItem key={cat} value={cat}>
+                        {cat}
+                      </MenuItem>
+                    ),
+                  )}
+                </Select>
+              ) : (
+                <Box sx={{ display: "flex", justifyContent: "end", mb: 2 }}>
+                  <Box
+                    sx={{
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 5,
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      backgroundColor: categoryColors[post.category],
+                      color: "#191810",
+                    }}
+                  >
+                    <Typography variant="subtitle1">{post.category}</Typography>
+                  </Box>
+                </Box>
+              )}
+              {edit ? (
+                <TextField
+                  label="Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: "30px" } }}
+                />
+              ) : (
+                <Box>
+                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                    {post.title}
+                  </Typography>
+                </Box>
+              )}
+
               <CardMedia
                 component="img"
                 image={getPostImage(post.image)}
@@ -462,7 +559,9 @@ export const PostDetailsPage = () => {
                   <img src={avatar} alt="avatar" width={40} />
                 </Avatar>
                 <Typography variant="body1" sx={{ ml: 2 }}>
-                  {user?.name + " " + user?.surname}
+                  {displayedAuthor
+                    ? displayedAuthor.name + " " + displayedAuthor.surname
+                    : user?.name + " " + user?.surname}
                 </Typography>
               </Box>
               <Box
@@ -490,7 +589,7 @@ export const PostDetailsPage = () => {
                 <Menu
                   anchorEl={anchorEl1}
                   open={open1}
-                  onClose={handleClose1}
+                  onClose={() => handleClose1}
                   anchorOrigin={{
                     vertical: "bottom",
                     horizontal: "center",
@@ -501,12 +600,127 @@ export const PostDetailsPage = () => {
                   }}
                 >
                   {users.map((us) => (
-                    <MenuItem key={us.id}>
+                    <MenuItem
+                      key={us.id}
+                      onClick={() => {
+                        setSelectedUser(us.id);
+                        handleClose1();
+                      }}
+                    >
                       {us.name + " " + us.surname}
                     </MenuItem>
                   ))}
                 </Menu>
               )}
+            </Card>
+            <Card elevation={3} sx={{ p: 4, borderRadius: 3, mt: 4 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                METADATA & STATS
+              </Typography>
+              {edit ? (
+                <TextField
+                  label="Time Lecture"
+                  type="number"
+                  value={timeLecture}
+                  onChange={(e) => setTimeLecture(Number(e.target.value))}
+                  fullWidth
+                  margin="normal"
+                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: "30px" } }}
+                />
+              ) : (
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      my: 2,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                      <CalendarMonthOutlinedIcon sx={{ fontSize: 20, mr: 1 }} />
+                      <Typography variant="body1">Published</Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ ml: 2 }}>
+                      {formatDate1(post.createdAt)}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                      <RemoveRedEyeOutlinedIcon sx={{ fontSize: 20, mr: 1 }} />
+                      <Typography variant="body1">Total Views</Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ ml: 2 }}>
+                      12.345
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                      <AccessTimeOutlinedIcon sx={{ fontSize: 20, mr: 1 }} />
+                      <Typography variant="body1">Read Time</Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ ml: 2 }}>
+                      {post.timeLecture + "min"}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              <hr />
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                TAGS
+              </Typography>
+              <Grid container gap={0.5}
+
+              >
+                {post.tags &&
+                  post.tags.map((t, i) => (
+                    <Grid
+                    size={{xs:5}}
+                      key={i}
+                      sx={{ border: "1px solid", p: 1, borderRadius: 5 }}
+                    >
+                      {edit ? (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent:'space-between'
+                            }}
+                          >
+                            <Typography variant="body2">{t}</Typography>
+                          <ClearOutlinedIcon sx={{ fontSize: 12 }}/>
+                            
+                          </Box>
+                     
+                      ) : (
+                        <Typography variant="body2">{t}</Typography>
+                      )}
+                    </Grid>
+                  ))}
+                  {
+                    edit && 
+                    <Button variant="contained" sx={{borderRadius:5}}>Add Tag  +</Button>
+                  }
+              </Grid>
             </Card>
           </Grid>
         </Grid>
