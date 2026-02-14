@@ -17,7 +17,7 @@ It demonstrates:
 - **React Router** – Routing
 
 ## 🏗 Project Structure
-```bash
+```graphql
 src/
 │
 ├── api/          # Axios setup
