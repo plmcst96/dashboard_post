@@ -1,5 +1,3 @@
-<img src="./src/assets/logo.png" style="width: 20px, heigth:20px">
-
 # ADMINPORTAL
 
 ## 📌 Project Overview
