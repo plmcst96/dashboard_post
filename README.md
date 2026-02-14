@@ -16,8 +16,8 @@ It demonstrates:
 - **JSON Server** – Mock backend
 - **React Router** – Routing
 
-##🏗 Project Structure
-
+## 🏗 Project Structure
+```bash
 src/
 │
 ├── api/          # Axios setup
@@ -27,7 +27,7 @@ src/
 ├── store/        # Zustand stores (users, posts, layout)
 ├── utils/        # Helper functions
 └── assets/       # Images, icons
-
+```
 
 ## 🔐 Features
 
