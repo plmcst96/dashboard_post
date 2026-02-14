@@ -54,12 +54,12 @@ src/
 npm install
 ```
 
-2️⃣ Start JSON Server
+2️⃣ Install JSON Server
 ```bash
-json-server --watch db.json --port 3001
-
+npm install -g json-server
 ```
-3️⃣ Start Vite development server
+
+3️⃣ Start Vite development server and JSON server
 ```bash
 npm run dev: all
 ```
