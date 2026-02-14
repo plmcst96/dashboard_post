@@ -52,7 +52,11 @@ type PostStore = {
   updatePost: (id: string, data: Partial<Post>) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
 
-  addComment: (postId: string, comment: Comment) => Promise<void>;
+  addComment: (
+  postId: string,
+  comment: Omit<Comment, "id" | "createdAt" | "postId">
+) => Promise<void>;
+
   updateComment: (postId: string, commentId: number, data: Partial<Comment>) => Promise<void>;
   deleteComment: (postId: string, commentId: number) => Promise<void>;
 };
@@ -163,22 +167,39 @@ if (!existingPost) throw new Error("Post not found");
     }
   },
 
-  addComment: async (postId, comment) => {
-    try {
-      const post = get().posts.find((p) => p.id === postId);
-      if (!post) throw new Error("Post not found");
+addComment: async (postId, commentData) => {
+  try {
+    const post = get().posts.find((p) => p.id === postId) || get().post;
+    if (!post) throw new Error("Post not found");
 
-      const updatedPost = { ...post, comments: [...(post.comments || []), comment] };
-      await api.put(`/posts/${postId}`, updatedPost);
+    const newComment: Comment = {
+      id: Date.now(),
+      postId: Number(postId), // 👈 lo aggiungi qui
+      userId: commentData.userId,
+      title: commentData.title,
+      content: commentData.content,
+      createdAt: new Date().toISOString(),
+    };
 
-      set((state) => ({
-        posts: state.posts.map((p) => (p.id === postId ? updatedPost : p)),
-        post: state.post?.id === postId ? updatedPost : state.post,
-      }));
-    } catch (error) {
-      console.error("Add comment error:", error);
-    }
-  },
+    const updatedPost: Post = {
+      ...post,
+      comments: [...(post.comments || []), newComment],
+      updatedAt: new Date().toISOString(),
+    };
+
+    await api.put(`/posts/${postId}`, updatedPost);
+
+    set((state) => ({
+      posts: state.posts.map((p) =>
+        p.id === postId ? updatedPost : p
+      ),
+      post: state.post?.id === postId ? updatedPost : state.post,
+    }));
+  } catch (error) {
+    console.error("Add comment error:", error);
+  }
+},
+
 
   updateComment: async (postId, commentId, data) => {
     try {

@@ -31,7 +31,6 @@ import avatar from "../assets/avatar_25.jpg";
 import { useUserStore } from "../store/users";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import React from "react";
 import SlateEditor, { type CustomElement } from "../components/SlateEditor";
@@ -60,6 +59,7 @@ export const PostDetailsPage = () => {
     updateState,
     deletePost,
     deleteState,
+    addComment,
   } = usePostStore();
   const [edit, setEdit] = useState(false);
   const { user, fetchUser, fetchUsers, users } = useUserStore();
@@ -76,7 +76,12 @@ export const PostDetailsPage = () => {
   const [selectedUser, setSelectedUser] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const navigate = useNavigate();
-  const [openComment, setOpenComment] = useState(false)
+  const [openComment, setOpenComment] = useState(false);
+  const [titleComment, setTitleComment] = useState("");
+  const [contentComment, setContentComment] = useState("");
+  const [selectedComment, setSelectedComment] = useState<number | null>(null);
+  const [isEditingComment, setIsEditingComment] = useState(false);
+  const [openDeleteCommentDialog, setOpenDeleteCommentDialog] = useState(false);
 
   //state iniziale dati
   useEffect(() => {
@@ -120,8 +125,12 @@ export const PostDetailsPage = () => {
   };
 
   //apre e chiude menu commenti
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (
+    event: React.MouseEvent<HTMLElement>,
+    commentId: number,
+  ) => {
     setAnchorEl(event.currentTarget);
+    setSelectedComment(commentId);
   };
 
   const handleClose = () => {
@@ -305,6 +314,40 @@ export const PostDetailsPage = () => {
       }, 3000);
       return () => clearTimeout(timer);
     }
+  };
+  const handleSaveComment = async () => {
+    if (!id || !titleComment.trim() || !contentComment.trim()) return;
+
+    if (isEditingComment && selectedComment) {
+      await usePostStore.getState().updateComment(id, selectedComment, {
+        title: titleComment,
+        content: contentComment,
+      });
+    } else {
+      await addComment(id, {
+        userId: user?.id || 1,
+        title: titleComment,
+        content: contentComment,
+      });
+    }
+
+    await fetchPost(id);
+
+    setTitleComment("");
+    setContentComment("");
+    setOpenComment(false);
+    setIsEditingComment(false);
+    setSelectedComment(null);
+  };
+
+  const handleDeleteComment = async () => {
+    if (!id || !selectedComment) return;
+
+    await usePostStore.getState().deleteComment(id, selectedComment);
+    await fetchPost(id);
+
+    setOpenDeleteCommentDialog(false);
+    setSelectedComment(null);
   };
 
   return (
@@ -525,17 +568,21 @@ export const PostDetailsPage = () => {
                     flexDirection="row"
                     justifyContent="space-between"
                   >
-                    <Box display="flex"
-                    flexDirection="row">
-<QuestionAnswerOutlinedIcon
-                      sx={{ mr: 2, color: "#F4D55D", fontSize: 30 }}
-                    />
-                    <Typography variant="h6">
-                      Comments ({post.comments?.length})
-                    </Typography>
+                    <Box display="flex" flexDirection="row">
+                      <QuestionAnswerOutlinedIcon
+                        sx={{ mr: 2, color: "#F4D55D", fontSize: 30 }}
+                      />
+                      <Typography variant="h6">
+                        Comments ({post.comments?.length})
+                      </Typography>
                     </Box>
-                    <Button variant="contained" onClick={()=>setOpenComment(true)}>Add Comment +</Button>
-                    
+                    <Button
+                      variant="contained"
+                      onClick={() => setOpenComment(true)}
+                      sx={{ borderRadius: 5 }}
+                    >
+                      Add Comment +
+                    </Button>
                   </Grid>
                   {post.comments?.length && post.comments?.length > 2 ? (
                     <Grid
@@ -551,12 +598,12 @@ export const PostDetailsPage = () => {
                   ) : null}
                 </Grid>
                 <hr />
-                <Grid container>
+                <Grid container mt={2}>
                   {post.comments &&
                     post.comments.map((com) => (
                       <React.Fragment key={com.id}>
                         <Grid
-                          size={{ xs: 12, md: 6 }}
+                          size={{ xs: 6 }}
                           display="flex"
                           flexDirection="row"
                         >
@@ -573,11 +620,11 @@ export const PostDetailsPage = () => {
                           </Box>
                         </Grid>
                         <Grid
-                          size={{ xs: 12, md: 6 }}
+                          size={{ xs: 6 }}
                           display="flex"
                           justifyContent="end"
                         >
-                          <IconButton onClick={handleClick}>
+                          <IconButton onClick={(e) => handleClick(e, com.id)}>
                             <MoreVertIcon />
                           </IconButton>
 
@@ -594,21 +641,31 @@ export const PostDetailsPage = () => {
                               horizontal: "right",
                             }}
                           >
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem
+                              onClick={() => {
+                                const comment = post.comments?.find(
+                                  (c) => c.id === selectedComment,
+                                );
+                                if (!comment) return;
+
+                                setTitleComment(comment.title);
+                                setContentComment(comment.content);
+                                setIsEditingComment(true);
+                                setOpenComment(true);
+                                handleClose();
+                              }}
+                            >
                               <ModeEditOutlinedIcon
                                 sx={{ fontSize: 20, mr: 1 }}
                               />
                               Edit Comment
                             </MenuItem>
-
-                            <MenuItem onClick={handleClose}>
-                              <AddCircleOutlineOutlinedIcon
-                                sx={{ fontSize: 20, mr: 1 }}
-                              />
-                              Add Comment
-                            </MenuItem>
-
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem
+                              onClick={() => {
+                                setOpenDeleteCommentDialog(true);
+                                handleClose();
+                              }}
+                            >
                               <DeleteOutlinedIcon
                                 sx={{ fontSize: 20, mr: 1 }}
                               />
@@ -616,7 +673,8 @@ export const PostDetailsPage = () => {
                             </MenuItem>
                           </Menu>
                         </Grid>
-                        <Grid mt={2}>
+
+                        <Grid mt={1} mb={2}>
                           <Typography variant="subtitle1">
                             {com.title}
                           </Typography>
@@ -842,17 +900,33 @@ export const PostDetailsPage = () => {
                 </Typography>
                 <Grid container gap={2} mt={2}>
                   <Grid size={{ xs: 12, md: 5 }}>
-                    <Button fullWidth variant="contained" sx={{borderRadius:6}} onClick={() => handleUpdate(post.status)}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{ borderRadius: 6 }}
+                      onClick={() => handleUpdate(post.status)}
+                    >
                       Save Changes
                     </Button>
                   </Grid>
                   <Grid size={{ xs: 12, md: 5 }}>
-                    <Button fullWidth variant="contained" sx={{borderRadius:6}} onClick={() => handleUpdate("published")}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{ borderRadius: 6 }}
+                      onClick={() => handleUpdate("published")}
+                    >
                       Publish
                     </Button>
                   </Grid>
                   <Grid size={{ xs: 12, md: 5 }}>
-                    <Button color="error" fullWidth variant="contained" sx={{borderRadius:6}} onClick={handleOpenDeleteDialog}>
+                    <Button
+                      color="error"
+                      fullWidth
+                      variant="contained"
+                      sx={{ borderRadius: 6 }}
+                      onClick={handleOpenDeleteDialog}
+                    >
                       Delete
                     </Button>
                   </Grid>
@@ -882,6 +956,80 @@ export const PostDetailsPage = () => {
           <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
           <Button
             onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openComment}
+        onClose={() => setOpenComment((prev) => !prev)}
+        sx={{ padding: 3 }}
+      >
+        <DialogTitle id="delete-dialog-title">Add Comment</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Title Comment"
+            value={titleComment}
+            onChange={(e) => setTitleComment(e.target.value)}
+            fullWidth
+            margin="normal"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "30px",
+              },
+            }}
+          />
+          <TextField
+            label="Content Comment"
+            value={contentComment}
+            onChange={(e) => setContentComment(e.target.value)}
+            fullWidth
+            margin="normal"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "30px",
+              },
+            }}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 5 }}
+            onClick={handleSaveComment}
+          >
+            {isEditingComment ? "Update Comment" : "Save Comment"}
+          </Button>
+
+          <Button
+            onClick={() => setOpenComment((prev) => !prev)}
+            variant="outlined"
+            sx={{ borderRadius: 5, color: "black", borderColor: "black" }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDeleteCommentDialog}
+        onClose={() => setOpenDeleteCommentDialog(false)}
+      >
+        <DialogTitle>Delete Comment</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this comment?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteCommentDialog(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteComment}
             color="error"
             variant="contained"
           >

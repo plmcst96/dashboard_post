@@ -6,6 +6,7 @@ import axios from "axios";
 type CrudState = {
   loading: boolean;
   error: string | null;
+  success: string | null
 };
 
 type UserState = {
@@ -14,7 +15,7 @@ type UserState = {
 
   // ---- CRUD STATE ----
   fetchState: CrudState;
-  postState: CrudState;
+  userState: CrudState;
   updateState: CrudState;
   deleteState: CrudState;
 
@@ -25,7 +26,7 @@ type UserState = {
   // ---- CRUD OPERATIONS ----
   fetchUsers: () => Promise<void>;
   fetchUser: (id: number) => Promise<void>;
-  addUser: (user: User) => Promise<void>;
+  addUser: (user: Omit<User, "id">) => Promise<void>;
   updateUser: (id: number, data: Partial<User>) => Promise<void>;
   deleteUser: (id: number) => Promise<void>;
 };
@@ -45,10 +46,10 @@ export const useUserStore = create<UserState>((set, get) => ({
   user: null,
 
   // ---- CRUD STATE ----
-  fetchState: { loading: false, error: null },
-  postState: { loading: false, error: null },
-  updateState: { loading: false, error: null },
-  deleteState: { loading: false, error: null },
+  fetchState: { loading: false, error: null, success: null },
+  userState: { loading: false, error: null , success: null },
+  updateState: { loading: false, error: null, success: null  },
+  deleteState: { loading: false, error: null , success: null },
 
   // ---- GETTERS ----
   getUserById: (id) => get().users.find((u) => u.id === id),
@@ -56,80 +57,90 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   // ---- FETCH ----
   fetchUsers: async () => {
-    set({ fetchState: { loading: true, error: null } });
+    set({ fetchState: { loading: true, error: null , success: null } });
     try {
       const res = await api.get("/users");
-      set({ users: res.data, fetchState: { loading: false, error: null } });
+      set({ users: res.data, fetchState: { loading: false, error: null, success: "Users required succesfully"  } });
     } catch (error: unknown) {
       set({
         fetchState: {
           loading: false,
           error: getErrorMessage(error),
+          success: null 
         },
       });
     }
   },
   fetchUser: async (id) => {
-    set({ postState: { loading: true, error: null } });
+    set({ userState: { loading: true, error: null , success: null } });
     try {
       const res = await api.get(`/users/${id}`);
-      set({ user: res.data, postState: { loading: false, error: null } });
+      set({ user: res.data, userState: { loading: false, error: null , success: "User required succesfully" } });
     } catch (error: unknown) {
       set({
         fetchState: {
           loading: false,
           error: getErrorMessage(error),
+           success: null 
         },
       });
     }
   },
   addUser: async (user) => {
-    set({ postState: { loading: true, error: null } });
-    try {
-      const res = await api.post("/users", user);
-      set((state) => ({
-        users: [...state.users, res.data],
-        postState: { loading: false, error: null },
-      }));
-    } catch (error: unknown) {
-      set({
-        fetchState: {
-          loading: false,
-          error: getErrorMessage(error),
-        },
-      });
+  set({ userState: { loading: true, error: null, success: null  } });
+  try {
+    const res = await api.post("/users", user);
+
+    if (!res.data.id) {
+      throw new Error("User created without id");
     }
-  },
+
+    set((state) => ({
+      users: [...state.users, res.data],
+      userState: { loading: false, error: null , success: "User add!" },
+    }));
+  } catch (error: unknown) {
+    set({
+      userState: {
+        loading: false,
+        error: getErrorMessage(error),
+        success: null 
+      },
+    });
+  }
+},
   updateUser: async (id, data) => {
-    set({ updateState: { loading: true, error: null } });
+    set({ updateState: { loading: true, error: null, success: null  } });
     try {
       const res = await api.put(`/users/${id}`, data);
       set((state) => ({
         users: state.users.map((u) => (u.id === id ? res.data : u)),
-        updateState: { loading: false, error: null },
+        updateState: { loading: false, error: null , success: "User updated!" },
       }));
     } catch (error: unknown) {
       set({
         fetchState: {
           loading: false,
           error: getErrorMessage(error),
+         success: null 
         },
       });
     }
   },
   deleteUser: async (id) => {
-    set({ deleteState: { loading: true, error: null } });
+    set({ deleteState: { loading: true, error: null, success: null  } });
     try {
       await api.delete(`/users/${id}`);
       set((state) => ({
         users: state.users.filter((u) => u.id !== id),
-        deleteState: { loading: false, error: null },
+        deleteState: { loading: false, error: null , success: "User deleted" },
       }));
     } catch (error: unknown) {
       set({
         fetchState: {
           loading: false,
           error: getErrorMessage(error),
+          success: null 
         },
       });
     }

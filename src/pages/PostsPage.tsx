@@ -44,7 +44,7 @@ export const PostsPage = () => {
             onClick={() => setOpen(!open)}
           >
             <AddCircleOutlineIcon sx={{ mr: 1 }} />
-            Create New Post
+            Create New User
           </Button>
         </Box>
         <Box>
