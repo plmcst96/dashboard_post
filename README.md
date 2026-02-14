@@ -66,7 +66,7 @@ npm run dev: all
 
 Access the app at: http://localhost:5173
 
-##📊 What This Shows
+## 📊 What This Shows
 Even as a junior developer, this project demonstrates:
 - Understanding of React & component-based architecture
 - Ability to manage state with Zustand
