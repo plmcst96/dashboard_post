@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+<img src="./src/assets/logo.png" style="width: 50px, heigth:50px">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# ADMINPORTAL
 
-Currently, two official plugins are available:
+## 📌 Project Overview
+This is a simple Admin Dashboard built with **React, Vite, and Material UI** as part of a technical assessment.
+It demonstrates:
+- Basic CRUD operations (users & posts)
+- State management with Zustand
+- Mock backend integration via JSON Server
+- Responsive UI with Material UI components
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 Tech Stack
+- **React (Vite)** – Frontend framework
+- **Material UI** – UI library
+- **Zustand** – Global state management
+- **Axios** – HTTP client
+- **JSON Server** – Mock backend
+- **React Router** – Routing
 
-## React Compiler
+##🏗 Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+src/
+│
+├── api/          # Axios setup
+├── auth/         # Authentication logic and types
+├── components/   # Reusable components (Drawer, Table, Cards)
+├── pages/        # Pages (Dashboard, Login, Users)
+├── store/        # Zustand stores (users, posts, layout)
+├── utils/        # Helper functions
+└── assets/       # Images, icons
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🔐 Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Authentication**
+- Login/logout
+- Reactive state for user session
+- Clearing credentials on logout
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**User Management**
+- List table users
+- Create / Edit / Delete user
+- Drawer-based form for create/edit
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Posts Dashboard**
+- Search posts by title
+- Filter by category
+- Responsive cards
+- Empty state and loading state handling
+
+## ⚙️ How to install
+
+1️⃣ Install dependencies
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2️⃣ Start JSON Server
+```bash
+json-server --watch db.json --port 3001
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+3️⃣ Start Vite development server
+```bash
+npm run dev: all
+```
+
+Access the app at: http://localhost:5173
+
+##📊 What This Shows
+Even as a junior developer, this project demonstrates:
+- Understanding of React & component-based architecture
+- Ability to manage state with Zustand
+- Handling CRUD operations and async logic
+- UI feedback management (loading, error, empty states)
+- Problem-solving and attention to edge cases
+
+Cristina Palmisani 👩🏼‍🎨👩🏽‍💻
+
+🧑‍💻 [LinkedIn](https://www.linkedin.com/in/cristina-palmisani-fullstack-developer/)
