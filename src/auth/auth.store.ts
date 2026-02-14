@@ -21,6 +21,15 @@ type CrudState = {
   error: string | null;
 };
 
+const initialState = {
+  user: null,
+  email: "",
+  password: "",
+  error: null,
+  userState: { loading: false, error: null },
+};
+
+
 type AuthState = {
   user: User | null;
   email: string;
@@ -48,13 +57,7 @@ const getErrorMessage = (error: unknown): string => {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  email: '',
-  password: '',
-  error: null,
-
-  fetchState: { loading: false, error: null },
-  userState: { loading: false, error: null },
+  ...initialState,
 
   setEmail: (email) => set({ email }),
   setPassword: (password) => set({ password }),
@@ -95,6 +98,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     return null;
   }
 },
-  logout: () => set({ user: null }),
+  logout: () => set(initialState),
   setError: (error) => set({ error }),
 }));

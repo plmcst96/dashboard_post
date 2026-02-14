@@ -140,16 +140,28 @@ export const UserTable = ({setOpen, setSelectedUser}:Props) => {
     }
   };
 
+  const safeUsers = useMemo(
+  () =>
+    users.filter(
+      (u): u is User =>
+        !!u &&
+        u.id !== null &&
+        u.id !== undefined
+    ),
+  [users]
+);
+
+
   const table = useMaterialReactTable({
     columns,
-    data: users,
-    getRowId: (row) => {
-      if (row.id == null) {
-        console.error("User without id:", row);
-        return crypto.randomUUID();
-      }
-      return row.id.toString();
-    },
+  data: safeUsers,
+ getRowId: (row) => {
+  if (!row || row.id == null) {
+    return "invalid-row";
+  }
+  return String(row.id);
+},
+
 
     enableEditing: true,
     editDisplayMode: "modal",

@@ -1,4 +1,3 @@
-
 import {
   Avatar,
   Box,
@@ -26,7 +25,11 @@ import CalendarViewMonthOutlinedIcon from "@mui/icons-material/CalendarViewMonth
 import { usePostStore } from "../store/post";
 import { useNavigate } from "react-router";
 import { useLayoutStore } from "../store/useLayoutStore";
-import { extractTextFromSlate, getPostImage, handleCardColor } from "../utils/function";
+import {
+  extractTextFromSlate,
+  getPostImage,
+  handleCardColor,
+} from "../utils/function";
 
 export const DashboardPage = () => {
   const posts = usePostStore((state) => state.posts);
@@ -40,7 +43,7 @@ export const DashboardPage = () => {
     (state) => state.setSelectedCategory,
   );
 
- const category = [
+  const category = [
     {
       name: "All",
       color: "#fdd58b",
@@ -84,7 +87,6 @@ export const DashboardPage = () => {
       ),
     },
   ];
-
 
   useEffect(() => {
     fetchPosts();
@@ -207,58 +209,71 @@ export const DashboardPage = () => {
           )}
 
           {!fetchState.loading && !fetchState.error && (
-            <Box
-              sx={{
-                display: "grid",
-                gap: 4,
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                pb: 1,
-              }}
-            >
-              {filteredPosts.map((post) => {
-                const previwContent = extractTextFromSlate(post.content);
-                return (
-                  <Card
-                    key={post.id}
-                    sx={{ borderRadius: 3, boxShadow: 3 }}
-                    style={{ backgroundColor: handleCardColor(post.category) }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="180"
-                      image={getPostImage(post.image)}
-                      alt={post.title}
-                    />
-
-                    <CardContent>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {post.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 1 }}
-                      >
-                        {previwContent.slice(0, 100) ||
-                          post.content.slice(0, 100)}
-                        ...
-                      </Typography>
-                      <Button
-                        onClick={() => navigate(`/posts/${post.id}`)}
-                        fullWidth
-                        sx={{
-                          mt: 2,
-                          backgroundColor: "#191810",
-                          color: "#fff",
+            <>
+              {filteredPosts.length === 0 ? (
+                <Box sx={{ textAlign: "center", mt: 5 }}>
+                  <Typography variant="h6" color="text.secondary">
+                    No posts found matching your search.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: "grid",
+                    gap: 4,
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(280px, 1fr))",
+                    pb: 1,
+                  }}
+                >
+                  {filteredPosts.map((post) => {
+                    const previwContent = extractTextFromSlate(post.content);
+                    return (
+                      <Card
+                        key={post.id}
+                        sx={{ borderRadius: 3, boxShadow: 3 }}
+                        style={{
+                          backgroundColor: handleCardColor(post.category),
                         }}
                       >
-                        Read More
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </Box>
+                        <CardMedia
+                          component="img"
+                          height="180"
+                          image={getPostImage(post.image)}
+                          alt={post.title}
+                        />
+
+                        <CardContent>
+                          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            {post.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 1 }}
+                          >
+                            {previwContent.slice(0, 100) ||
+                              post.content.slice(0, 100)}
+                            ...
+                          </Typography>
+                          <Button
+                            onClick={() => navigate(`/posts/${post.id}`)}
+                            fullWidth
+                            sx={{
+                              mt: 2,
+                              backgroundColor: "#191810",
+                              color: "#fff",
+                            }}
+                          >
+                            Read More
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </Box>
+              )}
+            </>
           )}
         </Box>
       </Box>

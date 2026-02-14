@@ -4,7 +4,7 @@
       "name": "Marios",
       "surname": "Rossi",
       "email": "mario@example.com",
-      "password": "",
+      "password": "password123",
       "country": "Angola",
       "province": "GT",
       "zipCode": "72014",
@@ -27,17 +27,17 @@
       "province": null
     },
     {
-      "id": "3",
       "name": "Andrea",
       "surname": "Verdi",
       "email": "andrea@example.com",
       "password": "password123",
-      "role": "user",
-      "address": null,
+      "country": "Italia",
+      "province": "GO",
+      "zipCode": "20089",
+      "address": "via mestre, 345",
       "city": null,
-      "zipCode": null,
-      "country": null,
-      "province": null
+      "role": "user",
+      "id": "3"
     },
     {
       "id": "4",
@@ -51,6 +51,19 @@
       "zipCode": null,
       "country": null,
       "province": null
+    },
+    {
+      "id": "2eac",
+      "name": "Cristina",
+      "surname": "Palmisani",
+      "email": "crispalmisani08@gmail.com",
+      "password": "password123",
+      "country": "Italia",
+      "province": "BR",
+      "zipCode": "72014",
+      "address": "Via Brindisi, 37",
+      "city": null,
+      "role": "admin"
     }
   ],
   "posts": [
@@ -86,14 +99,13 @@
       "id": "2",
       "userId": 3,
       "title": "Zaino in spalla: viaggiare low cost in Europa",
-      "content": "Viaggiare in Europa con un budget ridotto è possibile. In questo post condivido consigli pratici su come risparmiare su voli, alloggi e cibo, senza rinunciare all’esperienza. Dalle capitali più famose alle città meno conosciute, ogni viaggio può diventare un’avventura indimenticabile.",
+      "content": "[{\"type\":\"paragraph\",\"children\":[{\"text\":\"Viaggiare in Europa con un budget ridotto è possibile. In questo post condivido consigli pratici su come risparmiare su voli, alloggi e cibo, senza rinunciare all’esperienza. Dalle capitali più famose alle città meno conosciute, ogni viaggio può diventare un’avventura indimenticabile.\"}]}]",
       "createdAt": "2026-02-03T10:15:00Z",
-      "updatedAt": "2026-02-03T10:15:00Z",
+      "updatedAt": "2026-02-14T16:09:25.665Z",
       "rate": 3.5,
       "tags": [
         "travel",
-        "europe",
-        "backpacking"
+        "europe"
       ],
       "timeLecture": 7,
       "image": "../assets/posts/travel2.jpg",
@@ -333,23 +345,6 @@
           "createdAt": "2026-02-12T16:20:00Z"
         }
       ]
-    },
-    {
-      "id": "c756",
-      "userId": "3",
-      "title": "Test2222",
-      "content": "[{\"type\":\"paragraph\",\"children\":[{\"text\":\"Test\"}]}]",
-      "createdAt": "2026-02-13T17:20:12.710Z",
-      "updatedAt": "2026-02-13T21:53:49.905Z",
-      "tags": [
-        "test1",
-        "tetette"
-      ],
-      "timeLecture": 7,
-      "rate": 0,
-      "image": "",
-      "category": "Food",
-      "status": "published"
     }
   ]
 }

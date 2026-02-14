@@ -18,6 +18,7 @@ type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   selectedUser: User | null;
+  
 };
 
 export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
@@ -31,6 +32,7 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
   const [zipCode, setZipCode] = useState("");
   const [address, setAddress] = useState("");
   const [role, setRole] = useState<User["role"]>("user");
+  const [password, setPassword]=useState("password123")
 
   useEffect(() => {
     // Aggiorna i campi solo quando il drawer è aperto
@@ -47,6 +49,7 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
         setZipCode(selectedUser.zipCode || "");
         setAddress(selectedUser.address || "");
         setRole(selectedUser.role);
+        setPassword(selectedUser.password || "")
       } else {
         // reset campi
         setName("");
@@ -57,6 +60,7 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
         setZipCode("");
         setAddress("");
         setRole("user");
+        setPassword("password123")
       }
     }, 0);
 
@@ -72,7 +76,7 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
       name,
       surname,
       email,
-      password: "", // opzionale per update
+      password, // opzionale per update
       country,
       province,
       zipCode,
@@ -98,8 +102,10 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
     setZipCode("");
     setAddress("");
     setRole("user");
+    setPassword("password123")
 
     setOpen(false);
+    
   };
 
   return (

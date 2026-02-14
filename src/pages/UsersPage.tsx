@@ -1,11 +1,10 @@
-import { Box, Breadcrumbs, Button, Typography } from '@mui/material';
-import { PageLayout } from '../components/PageLayout';
-import { useState } from 'react';
+import { Box, Breadcrumbs, Button, Typography } from "@mui/material";
+import { PageLayout } from "../components/PageLayout";
+import { useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { UserTable } from '../components/UserTable';
-import UserDrawer from '../components/UserDrawer';
-import type { User } from '../auth/auth.store';
-
+import { UserTable } from "../components/UserTable";
+import UserDrawer from "../components/UserDrawer";
+import type { User } from "../auth/auth.store";
 
 export const UsersPage = () => {
   const [open, setOpen] = useState(false);
@@ -43,16 +42,19 @@ export const UsersPage = () => {
             variant="contained"
             color="primary"
             sx={{ borderRadius: 5 }}
-            onClick={() => setOpen(!open)}
+            onClick={() => {
+              setOpen((prev) => !prev);
+              setSelectedUser(null);
+            }}
           >
             <AddCircleOutlineIcon sx={{ mr: 1 }} />
-            Create New Post
+            Create New User
           </Button>
         </Box>
         <Box>
-          <UserTable setOpen={setOpen} setSelectedUser={setSelectedUser}/>
+          <UserTable setOpen={setOpen} setSelectedUser={setSelectedUser} />
         </Box>
-        <UserDrawer open={open} setOpen={setOpen} selectedUser={selectedUser}/>
+        <UserDrawer open={open} setOpen={setOpen} selectedUser={selectedUser} />
       </Box>
     </PageLayout>
   );
