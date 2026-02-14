@@ -1,4 +1,4 @@
-<img src="./src/assets/logo.png" style="width: 50px, heigth:50px">
+<img src="./src/assets/logo.png" style="width: 20px, heigth:20px">
 
 # ADMINPORTAL
 
