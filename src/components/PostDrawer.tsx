@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Drawer from "@mui/material/Drawer";
 import {
   Box,
@@ -11,11 +12,11 @@ import {
   Button,
 } from "@mui/material";
 import { usePostStore, type Post } from "../store/post";
-import { useState} from "react";
+import { useState } from "react";
 import { theme } from "../main";
 import { useAuthStore } from "../auth/auth.store";
 import SlateEditor, { type CustomElement } from "./SlateEditor";
-import type { Descendant } from "slate";
+import { type Descendant } from "slate";
 import { fileToBase64 } from "../utils/function";
 
 type Props = {
@@ -35,10 +36,62 @@ export default function PostDrawer({ open, setOpen }: Props) {
   const [value, setValue] = useState<Descendant[]>([
     { type: "paragraph", children: [{ text: "" }] } as CustomElement,
   ]);
+  const [errors, setErrors] = useState<{
+    title?: string;
+    content?: string;
+    timeLecture?: string;
+    category?: string;
+  }>({});
 
-  const toggleDrawer = (newOpen: boolean) => () => setOpen(newOpen);
+  const toggleDrawer = (newOpen: boolean) => () => {
+    if (!newOpen) resetForm();
+    setOpen(newOpen);
+  };
+
+  const validate = () => {
+    const newErrors: typeof errors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    const hasContent = value.some(
+      (n) => "children" in n && n.children.some((c: any) => c.text?.trim()),
+    );
+
+    if (!hasContent) {
+      newErrors.content = "Content is required";
+    }
+
+    if (!timeLecture || Number(timeLecture) <= 0) {
+      newErrors.timeLecture = "Time lecture must be greater than 0";
+    }
+
+    if (!category) {
+      newErrors.category = "Category is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setTags("");
+    setTimeLecture("");
+    setImage("");
+    setCategory("Travel");
+    setErrors({});
+    setValue([
+      {
+        type: "paragraph",
+        children: [{ text: "" }],
+      } as CustomElement,
+    ]);
+  };
 
   const handleSave = (status: string) => {
+    if (!validate()) return;
     const content = JSON.stringify(value);
     const post: Omit<Post, "id"> = {
       userId: user?.id || 1,
@@ -54,6 +107,7 @@ export default function PostDrawer({ open, setOpen }: Props) {
       status: status as Post["status"],
     };
     addPost(post);
+    resetForm();
     setOpen(false);
   };
 
@@ -65,10 +119,16 @@ export default function PostDrawer({ open, setOpen }: Props) {
         </Typography>
         <FormGroup>
           <TextField
+            required
             label="Title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setErrors((prev) => ({ ...prev, title: undefined }));
+            }}
             fullWidth
+            error={!!errors.title}
+            helperText={errors.title}
             margin="normal"
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: "30px" } }}
           />
@@ -85,9 +145,14 @@ export default function PostDrawer({ open, setOpen }: Props) {
               overflowX: "hidden",
             }}
           >
-            <SlateEditor value={value} setValue={setValue}/>
-            
+            <SlateEditor value={value} setValue={setValue} />
           </Box>
+          {errors.content && (
+            <Typography color="error" variant="caption">
+              {errors.content}
+            </Typography>
+          )}
+
           <TextField
             label="Tags (comma separated)"
             value={tags}
@@ -97,10 +162,16 @@ export default function PostDrawer({ open, setOpen }: Props) {
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: "30px" } }}
           />
           <TextField
+            required
             type="number"
             label="Time Lecture (minutes)"
             value={timeLecture}
-            onChange={(e) => setTimeLecture(e.target.value)}
+            onChange={(e) => {
+              setTimeLecture(e.target.value);
+              setErrors((prev) => ({ ...prev, timeLecture: undefined }));
+            }}
+            error={!!errors.timeLecture}
+            helperText={errors.timeLecture}
             fullWidth
             margin="normal"
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: "30px" } }}
@@ -121,10 +192,15 @@ export default function PostDrawer({ open, setOpen }: Props) {
           <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
             <InputLabel id="category-label">Category</InputLabel>
             <Select
+              required
               labelId="category-label"
               value={category}
               label="Category"
-              onChange={(e) => setCategory(e.target.value as Post["category"])}
+              onChange={(e) => {
+                setCategory(e.target.value as Post["category"]);
+                setErrors((prev) => ({ ...prev, category: undefined }));
+              }}
+              error={!!errors.category}
               sx={{
                 borderRadius: "30px",
                 "& .MuiOutlinedInput-notchedOutline": { borderRadius: "30px" },

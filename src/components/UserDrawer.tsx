@@ -18,7 +18,6 @@ type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   selectedUser: User | null;
-  
 };
 
 export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
@@ -32,7 +31,13 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
   const [zipCode, setZipCode] = useState("");
   const [address, setAddress] = useState("");
   const [role, setRole] = useState<User["role"]>("user");
-  const [password, setPassword]=useState("password123")
+  const [password, setPassword] = useState("password123");
+  const [errors, setErrors] = useState<{
+    name?: string;
+    surname?: string;
+    email?: string;
+    role?: string;
+  }>({});
 
   useEffect(() => {
     // Aggiorna i campi solo quando il drawer è aperto
@@ -49,7 +54,7 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
         setZipCode(selectedUser.zipCode || "");
         setAddress(selectedUser.address || "");
         setRole(selectedUser.role);
-        setPassword(selectedUser.password || "")
+        setPassword(selectedUser.password || "");
       } else {
         // reset campi
         setName("");
@@ -60,7 +65,7 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
         setZipCode("");
         setAddress("");
         setRole("user");
-        setPassword("password123")
+        setPassword("password123");
       }
     }, 0);
 
@@ -69,8 +74,26 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
 
   const toggleDrawer = (newOpen: boolean) => () => setOpen(newOpen);
 
+  const validate = () => {
+    const newErrors: typeof errors = {};
+
+    if (!name.trim()) newErrors.name = "Name is required";
+    if (!surname.trim()) newErrors.surname = "Surname is required";
+    if (!role.trim()) newErrors.role = "Role is required";
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      newErrors.email = "Email is not valid";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
-    if (!name || !surname || !email) return;
+    if (!validate()) return;
 
     const userData: Omit<User, "id"> = {
       name,
@@ -102,10 +125,9 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
     setZipCode("");
     setAddress("");
     setRole("user");
-    setPassword("password123")
+    setPassword("password123");
 
     setOpen(false);
-    
   };
 
   return (
@@ -119,7 +141,13 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
           <TextField
             label="Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setErrors((prev) => ({ ...prev, name: undefined }));
+            }}
+            error={!!errors.name}
+            helperText={errors.name}
+            required
             fullWidth
             margin="normal"
             sx={{
@@ -132,7 +160,13 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
           <TextField
             label="Surname"
             value={surname}
-            onChange={(e) => setSurname(e.target.value)}
+            onChange={(e) => {
+              setSurname(e.target.value);
+              setErrors((prev) => ({ ...prev, surname: undefined }));
+            }}
+            error={!!errors.surname}
+            helperText={errors.surname}
+            required
             fullWidth
             margin="normal"
             sx={{
@@ -146,7 +180,13 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
             label="Email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrors((prev) => ({ ...prev, email: undefined }));
+            }}
+            error={!!errors.email}
+            helperText={errors.email}
+            required
             fullWidth
             margin="normal"
             sx={{
@@ -211,13 +251,18 @@ export default function UserDrawer({ open, setOpen, selectedUser }: Props) {
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>Role</InputLabel>
             <Select
+              required
               value={role}
               label="Role"
-              onChange={(e) => setRole(e.target.value as User["role"])}
+              onChange={(e) => {
+                setRole(e.target.value as User["role"]);
+                setErrors((prev) => ({ ...prev, role: undefined }));
+              }}
               sx={{
                 borderRadius: "30px",
                 "& .MuiOutlinedInput-notchedOutline": { borderRadius: "30px" },
               }}
+              error={!!errors.role}
             >
               <MenuItem value="user">User</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>

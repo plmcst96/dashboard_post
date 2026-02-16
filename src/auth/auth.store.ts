@@ -23,6 +23,7 @@ type CrudState = {
 
 const initialState = {
   user: null,
+  userId: null, 
   email: "",
   password: "",
   error: null,
@@ -35,6 +36,7 @@ type AuthState = {
   email: string;
   password: string;
   error: string | null;
+  userId: number | null;
 
   userState: CrudState;
 
@@ -56,11 +58,12 @@ const getErrorMessage = (error: unknown): string => {
   return "Something went wrong";
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   ...initialState,
 
   setEmail: (email) => set({ email }),
   setPassword: (password) => set({ password }),
+  getUserId: () => get().user?.id ?? null,
 
   login: async (email, password) => {
   set({ userState: { loading: true, error: null }, error: null });
@@ -82,6 +85,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     set({
       user,
+      userId:user.id,
       userState: { loading: false, error: null },
       error: null,
     });

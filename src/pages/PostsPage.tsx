@@ -4,9 +4,11 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { PostsTable } from "../components/PostsTable";
 import { useState } from "react";
 import PostDrawer from "../components/PostDrawer";
+import { useNavigate } from "react-router";
 
 export const PostsPage = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate()
 
   return (
     <PageLayout>
@@ -16,9 +18,9 @@ export const PostsPage = () => {
             <Typography
               variant="body2"
               sx={{ cursor: "pointer", color: "text.secondary" }}
-              onClick={() => window.history.back()}
+              onClick={() => navigate('/')}
             >
-              Home
+              Dashboard
             </Typography>
 
             <Typography variant="body2" sx={{ color: "#191810" }}>

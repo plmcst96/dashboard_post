@@ -5,10 +5,13 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { UserTable } from "../components/UserTable";
 import UserDrawer from "../components/UserDrawer";
 import type { User } from "../auth/auth.store";
+import { useNavigate } from "react-router";
 
 export const UsersPage = () => {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const navigate = useNavigate()
+
   return (
     <PageLayout>
       <Box>
@@ -17,9 +20,9 @@ export const UsersPage = () => {
             <Typography
               variant="body2"
               sx={{ cursor: "pointer", color: "text.secondary" }}
-              onClick={() => window.history.back()}
+              onClick={() =>navigate('/')}
             >
-              Home
+              Dashboard
             </Typography>
 
             <Typography variant="body2" sx={{ color: "#191810" }}>

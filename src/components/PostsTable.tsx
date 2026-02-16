@@ -10,7 +10,19 @@ import type {
   MRT_ColumnFiltersState,
   MRT_SortingState,
 } from "material-react-table";
-import { Avatar, Box, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { usePostStore, type Post } from "../store/post";
@@ -21,6 +33,7 @@ import avatar from "../assets/avatar_25.jpg";
 import { categoryColors } from "../utils/function";
 
 export const PostsTable = () => {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const {
     posts,
     fetchPosts,
@@ -34,6 +47,7 @@ export const PostsTable = () => {
     Record<string, string>
   >({});
   const navigate = useNavigate();
+  const [rowToDelete, setRowToDelete] = useState<MRT_Row<Post> | null>(null);
 
   // Zustand table store
   const pageIndex = useTableStore((state) => state.pageIndex);
@@ -55,6 +69,24 @@ export const PostsTable = () => {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  const handleOpenDeleteDialog = (row: MRT_Row<Post>) => {
+    setRowToDelete(row);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setRowToDelete(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!rowToDelete) return;
+
+    deletePost(rowToDelete.original.id);
+    setOpenDeleteDialog(false);
+    setRowToDelete(null);
+  };
 
   const columns = useMemo<MRT_ColumnDef<Post>[]>(
     () => [
@@ -147,13 +179,6 @@ export const PostsTable = () => {
     ],
     [validationErrors, users],
   );
-
-  const handleDelete = (row: MRT_Row<Post>) => {
-    if (window.confirm("Delete this post?")) {
-      deletePost(row.original.id);
-    }
-  };
-
   const table = useMaterialReactTable({
     columns,
     data: posts,
@@ -174,7 +199,7 @@ export const PostsTable = () => {
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
-          <IconButton color="error" onClick={() => handleDelete(row)}>
+          <IconButton color="error" onClick={() => handleOpenDeleteDialog(row)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -234,5 +259,36 @@ export const PostsTable = () => {
       : undefined,
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <MaterialReactTable table={table} />
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this post?
+            <br />
+            <strong>This action cannot be undone.</strong>
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 };

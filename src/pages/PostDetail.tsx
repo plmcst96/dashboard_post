@@ -48,6 +48,7 @@ import {
 } from "../utils/function";
 import { IOSSwitch } from "../utils/styleMUI";
 import { PostContent } from "../components/PostContent";
+import { useAuthStore } from "../auth/auth.store";
 
 export const PostDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,6 +64,7 @@ export const PostDetailsPage = () => {
   } = usePostStore();
   const [edit, setEdit] = useState(false);
   const { user, fetchUser, fetchUsers, users } = useUserStore();
+  const userId = useAuthStore((state) => state.userId);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
@@ -318,6 +320,11 @@ export const PostDetailsPage = () => {
   const handleSaveComment = async () => {
     if (!id || !titleComment.trim() || !contentComment.trim()) return;
 
+    if (!userId) {
+      alert("You must be logged in to add a comment");
+      return;
+    }
+
     if (isEditingComment && selectedComment) {
       await usePostStore.getState().updateComment(id, selectedComment, {
         title: titleComment,
@@ -325,7 +332,7 @@ export const PostDetailsPage = () => {
       });
     } else {
       await addComment(id, {
-        userId: user?.id || 1,
+        userId,
         title: titleComment,
         content: contentComment,
       });
@@ -359,14 +366,14 @@ export const PostDetailsPage = () => {
             <Typography
               variant="body2"
               sx={{ cursor: "pointer", color: "text.secondary" }}
-              onClick={() => window.history.back()}
+              onClick={() => navigate("/")}
             >
-              Home
+              Dashboard
             </Typography>
             <Typography
               variant="body2"
               sx={{ cursor: "pointer", color: "text.secondary" }}
-              onClick={() => window.history.back()}
+              onClick={() => navigate('/posts')}
             >
               Posts
             </Typography>
@@ -600,88 +607,100 @@ export const PostDetailsPage = () => {
                 <hr />
                 <Grid container mt={2}>
                   {post.comments &&
-                    post.comments.map((com) => (
-                      <React.Fragment key={com.id}>
-                        <Grid
-                          size={{ xs: 6 }}
-                          display="flex"
-                          flexDirection="row"
-                        >
-                          <Avatar>
-                            <img src={avatar} alt="avatar" width={40} />
-                          </Avatar>
-                          <Box sx={{ ml: 2 }}>
-                            <Typography>
-                              {user?.name + " " + user?.surname}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {formatDate(com.createdAt)}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid
-                          size={{ xs: 6 }}
-                          display="flex"
-                          justifyContent="end"
-                        >
-                          <IconButton onClick={(e) => handleClick(e, com.id)}>
-                            <MoreVertIcon />
-                          </IconButton>
-
-                          <Menu
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "right",
-                            }}
-                            transformOrigin={{
-                              vertical: "top",
-                              horizontal: "right",
-                            }}
+                    post.comments.map((com) => {
+                      const commentAuthor = users.find(
+                        (u) => u.id === com.userId,
+                      );
+                      return (
+                        <React.Fragment key={com.id}>
+                          <Grid
+                            size={{ xs: 6 }}
+                            display="flex"
+                            flexDirection="row"
                           >
-                            <MenuItem
-                              onClick={() => {
-                                const comment = post.comments?.find(
-                                  (c) => c.id === selectedComment,
-                                );
-                                if (!comment) return;
+                            <Avatar>
+                              <img src={avatar} alt="avatar" width={40} />
+                            </Avatar>
+                            <Box sx={{ ml: 2 }}>
+                              <Typography>
+                                {commentAuthor
+                                  ? `${commentAuthor.name} ${commentAuthor.surname}`
+                                  : `${user?.name + " " + user?.surname}`}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {formatDate(com.createdAt)}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid
+                            size={{ xs: 6 }}
+                            display="flex"
+                            justifyContent="end"
+                          >
+                            <IconButton onClick={(e) => handleClick(e, com.id)}>
+                              <MoreVertIcon />
+                            </IconButton>
 
-                                setTitleComment(comment.title);
-                                setContentComment(comment.content);
-                                setIsEditingComment(true);
-                                setOpenComment(true);
-                                handleClose();
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={open}
+                              onClose={handleClose}
+                              anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "right",
+                              }}
+                              transformOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
                               }}
                             >
-                              <ModeEditOutlinedIcon
-                                sx={{ fontSize: 20, mr: 1 }}
-                              />
-                              Edit Comment
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => {
-                                setOpenDeleteCommentDialog(true);
-                                handleClose();
-                              }}
-                            >
-                              <DeleteOutlinedIcon
-                                sx={{ fontSize: 20, mr: 1 }}
-                              />
-                              Delete Comment
-                            </MenuItem>
-                          </Menu>
-                        </Grid>
+                              <MenuItem
+                                onClick={() => {
+                                  const comment = post.comments?.find(
+                                    (c) => c.id === selectedComment,
+                                  );
+                                  if (!comment) return;
 
-                        <Grid mt={1} mb={2}>
-                          <Typography variant="subtitle1">
-                            {com.title}
-                          </Typography>
-                          <Typography variant="body2">{com.content}</Typography>
-                        </Grid>
-                      </React.Fragment>
-                    ))}
+                                  setTitleComment(comment.title);
+                                  setContentComment(comment.content);
+                                  setIsEditingComment(true);
+                                  setOpenComment(true);
+                                  handleClose();
+                                }}
+                              >
+                                <ModeEditOutlinedIcon
+                                  sx={{ fontSize: 20, mr: 1 }}
+                                />
+                                Edit Comment
+                              </MenuItem>
+                              <MenuItem
+                                onClick={() => {
+                                  setOpenDeleteCommentDialog(true);
+                                  handleClose();
+                                }}
+                              >
+                                <DeleteOutlinedIcon
+                                  sx={{ fontSize: 20, mr: 1 }}
+                                />
+                                Delete Comment
+                              </MenuItem>
+                            </Menu>
+                          </Grid>
+
+                          <Grid size={{ xs: 12 }} mt={1} mb={2}>
+                            <Typography variant="subtitle1">
+                              {com.title}
+                            </Typography>
+                            <Typography variant="body2">
+                              {com.content}
+                            </Typography>
+                          </Grid>
+                        </React.Fragment>
+                      );
+                    })}
                 </Grid>
               </Box>
             </Card>
